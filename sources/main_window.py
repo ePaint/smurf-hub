@@ -232,12 +232,12 @@ class MainWindow(QWidget):
 
         vbs_file_path = str(VBS_FOLDER.joinpath(f'{name}-login{"-keepass" if SETTINGS.keepass_enabled else ""}.vbs'))
         lnk_file_path = str(DESKTOP_PATH.joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
-        behavior = 'always_use_keepass' if SETTINGS.keepass_enabled else 'never_use_keepass'
+        behavior = 'use_keepass' if SETTINGS.keepass_enabled else 'use_credentials'
         message_popup(message=f'Creating shortcut for {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""} in Desktop')
         with open(vbs_file_path, 'w+') as f:
             f.writelines([
                 'Set objShell = CreateObject("WScript.Shell")\n',
-                f'customCommand = """{EXEC_PATH}"" --name ""{name}"" --behavior {behavior}"\n',
+                f'customCommand = """{EXEC_PATH}"" --name ""{name}"" --behavior ""{behavior}"""\n',
                 'objShell.Run customCommand, 0, True'
             ])
         shell = Dispatch('WScript.Shell')
