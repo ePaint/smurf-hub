@@ -32,8 +32,8 @@ class InvalidCredentials(Exception):
 
 class LoginBehavior(Enum):
     USE_SETTINGS = 'use_settings'  # Check settings to see if keepass should be used (default)
-    ALWAYS_USE_KEEPASS = 'always_use_keepass'
-    NEVER_USE_KEEPASS = 'never_use_keepass'
+    USE_KEEPASS = 'use_keepass'
+    USE_CREDENTIALS = 'use_credentials'
 
 
 def get_account(name: str) -> Account:
@@ -44,9 +44,9 @@ def get_account(name: str) -> Account:
 
 
 def get_credentials(account: Account, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS) -> (str, str):
-    if behavior == LoginBehavior.ALWAYS_USE_KEEPASS:
+    if behavior == LoginBehavior.USE_KEEPASS:
         use_keepass = True
-    elif behavior == LoginBehavior.NEVER_USE_KEEPASS:
+    elif behavior == LoginBehavior.USE_CREDENTIALS:
         use_keepass = False
     else:
         use_keepass = SETTINGS.keepass_enabled
