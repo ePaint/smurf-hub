@@ -1,23 +1,28 @@
 import os.path
 from functools import partial
+from pathlib import Path
 from typing import Optional
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QStyle
+from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QStyle, QFileDialog
+from pydantic import ValidationError
 from win32com.client import Dispatch
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, APP_MANAGER
+from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE
+from sources.error_popup import error_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
-from lol_manager import login_lol_client, LoginBehavior, start_lol_client, stop_lol_client, restart_lol_client
+from lol_manager import login_lol_client, LoginBehavior, start_lol_client, stop_lol_client, restart_lol_client, InvalidSettings
 
 
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.settings_lol_path_input: Optional[QLineEdit] = None
+        self.settings_lol_path_file_selector_button: Optional[QPushButton] = None
         self.settings_use_keepass_button: Optional[QPushButton] = None
         self.settings_keepass_path_label: Optional[QLabel] = None
         self.settings_keepass_path_input: Optional[QLineEdit] = None
+        self.settings_keepass_path_file_selector_button: Optional[QPushButton] = None
         self.new_account_name_label: Optional[QLabel] = None
         self.new_account_name_input: Optional[QLineEdit] = None
         self.new_account_keepass_reference_label: Optional[QLabel] = None
@@ -39,13 +44,16 @@ class MainWindow(QWidget):
 
         # Init widgets
         self.settings_lol_path_input.setText(SETTINGS.lol_path)
+        self.settings_lol_path_file_selector_button.clicked.connect(self.select_lol_folder)
+
         self.settings_use_keepass_button.setChecked(SETTINGS.keepass_enabled)
         self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
+        self.settings_keepass_path_file_selector_button.clicked.connect(self.select_keepass_file)
 
-        self.settings_lol_path_input.editingFinished.connect(self.save_settings)
+        self.settings_lol_path_input.returnPressed.connect(self.save_settings)
         self.settings_use_keepass_button.clicked.connect(self.toggle_keepass)
         self.settings_use_keepass_button.clicked.connect(self.save_settings)
-        self.settings_keepass_path_input.editingFinished.connect(self.save_settings)
+        self.settings_keepass_path_input.returnPressed.connect(self.save_settings)
 
         self.new_account_add_button.clicked.connect(self.add_account)
         self.toggle_keepass()
@@ -53,11 +61,23 @@ class MainWindow(QWidget):
         self.init_accounts_table()
         self.accounts_table.cellChanged.connect(self.save_accounts_table_changes)
 
-        self.start_lol_client_button.clicked.connect(start_lol_client)
-        self.stop_lol_client_button.clicked.connect(stop_lol_client)
-        self.restart_lol_client_button.clicked.connect(restart_lol_client)
+        self.start_lol_client_button.clicked.connect(self.start_lol_client)
+        self.stop_lol_client_button.clicked.connect(self.stop_lol_client)
+        self.restart_lol_client_button.clicked.connect(self.restart_lol_client)
 
         self.show()
+
+    def select_lol_folder(self):
+        selected_path = QFileDialog.getExistingDirectory(self, 'Select League of Legends folder', SETTINGS.lol_path)
+        SETTINGS.set_lol_path(str(Path(selected_path)))
+        self.settings_lol_path_input.setText(SETTINGS.lol_path)
+        SETTINGS.save()
+
+    def select_keepass_file(self):
+        selected_path = QFileDialog.getOpenFileName(self, 'Select KeePass file', SETTINGS.keepass_path, 'KeePass files (*.kdbx)')[0]
+        SETTINGS.keepass_path = str(Path(selected_path))
+        self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
+        SETTINGS.save()
 
     def add_account(self):
         try:
@@ -68,8 +88,10 @@ class MainWindow(QWidget):
                 username=self.new_account_username_input.text() or None,
                 password=self.new_account_password_input.text() or None
             )
-        except ValueError as e:
-            print(e)
+        except ValidationError as e:
+            message = e.errors()[0]['msg']
+            print(message)
+            error_popup(message=message)
             return
         self.new_account_name_input.setText('')
         self.new_account_keepass_reference_input.setText('')
@@ -161,11 +183,13 @@ class MainWindow(QWidget):
         self.new_account_password_label.setStyleSheet(inverted_style)
 
         self.settings_keepass_path_input.setStyleSheet(style)
+        self.settings_keepass_path_file_selector_button.setStyleSheet(style)
         self.new_account_keepass_reference_input.setStyleSheet(style)
         self.new_account_username_input.setStyleSheet(inverted_style)
         self.new_account_password_input.setStyleSheet(inverted_style)
 
         self.settings_keepass_path_input.setDisabled(not SETTINGS.keepass_enabled)
+        self.settings_keepass_path_file_selector_button.setDisabled(not SETTINGS.keepass_enabled)
         self.new_account_keepass_reference_input.setDisabled(not SETTINGS.keepass_enabled)
         self.new_account_username_input.setDisabled(SETTINGS.keepass_enabled)
         self.new_account_password_input.setDisabled(SETTINGS.keepass_enabled)
@@ -173,14 +197,18 @@ class MainWindow(QWidget):
 
     def save_settings(self):
         lol_path = self.settings_lol_path_input.text()
-        if not os.path.exists(lol_path):
+        if lol_path and not os.path.exists(lol_path):
+            error_popup(message='Invalid League of Legends path')
+            self.settings_lol_path_input.setText(SETTINGS.lol_path)
             return
 
         keepass_path = self.settings_keepass_path_input.text()
         if keepass_path and not os.path.exists(keepass_path):
+            error_popup(message='Invalid KeePass path')
+            self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
             return
 
-        SETTINGS.lol_path = lol_path
+        SETTINGS.set_lol_path(lol_path)
         SETTINGS.keepass_path = keepass_path
         SETTINGS.save()
 
@@ -211,3 +239,26 @@ class MainWindow(QWidget):
         shortcut_file.WindowStyle = 7
         shortcut_file.save()
 
+    @staticmethod
+    def start_lol_client():
+        try:
+            start_lol_client()
+        except InvalidSettings as e:
+            print(e)
+            error_popup(message=str(e))
+
+    @staticmethod
+    def stop_lol_client():
+        try:
+            stop_lol_client()
+        except InvalidSettings as e:
+            print(e)
+            error_popup(message=str(e))
+
+    @staticmethod
+    def restart_lol_client():
+        try:
+            restart_lol_client()
+        except InvalidSettings as e:
+            print(e)
+            error_popup(message=str(e))

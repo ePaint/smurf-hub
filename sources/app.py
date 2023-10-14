@@ -1,6 +1,5 @@
 import sys
 from enum import Enum
-
 from PyQt6.QtWidgets import QApplication
 
 

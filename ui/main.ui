@@ -24,7 +24,7 @@
     <rect>
      <x>10</x>
      <y>30</y>
-     <width>421</width>
+     <width>391</width>
      <height>20</height>
     </rect>
    </property>
@@ -34,12 +34,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>47</width>
-     <height>13</height>
+     <width>81</width>
+     <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>LoL Path</string>
+    <string>LoL Folder Path</string>
    </property>
   </widget>
   <widget class="Line" name="line">
@@ -76,7 +76,7 @@
     <rect>
      <x>100</x>
      <y>80</y>
-     <width>331</width>
+     <width>301</width>
      <height>20</height>
     </rect>
    </property>
@@ -89,12 +89,12 @@
     <rect>
      <x>100</x>
      <y>60</y>
-     <width>71</width>
+     <width>101</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>KeePass Path</string>
+    <string>KeePass File Path</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="new_account_name_input">
@@ -192,7 +192,7 @@
   </widget>
   <widget class="QLabel" name="new_account_username_label">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="geometry">
     <rect>
@@ -278,6 +278,38 @@ Restart LoL Client</string>
    <property name="text">
     <string>⛔
 Stop LoL Client</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="settings_lol_path_file_selector_button">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>30</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>📂</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="settings_keepass_path_file_selector_button">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>80</y>
+     <width>21</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>📂</string>
    </property>
    <property name="checkable">
     <bool>false</bool>

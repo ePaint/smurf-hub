@@ -1,11 +1,10 @@
-import os
 from pathlib import Path
 from typing import List
 from pydantic import BaseModel, root_validator
 from definitions import PROJECT_FOLDER
 
+
 SETTINGS_PATH = str(PROJECT_FOLDER.joinpath('settings.json'))
-print(SETTINGS_PATH)
 
 
 class Settings(BaseModel):
@@ -21,12 +20,22 @@ class Settings(BaseModel):
         with open(SETTINGS_PATH, 'w+') as f:
             f.write(self.json(indent=4))
 
+    def set_lol_path(self, value):
+        self.lol_path = value
+        if value:
+            path = Path(value)
+            self.lol_client_path = str(path.parent.joinpath('Riot Client').joinpath('RiotClientServices.exe'))
+        else:
+            self.lol_client_path = ''
+
     @root_validator
     def build_extra_fields(cls, values):
         lol_path = values.get('lol_path')
         if lol_path:
             path = Path(lol_path)
             values['lol_client_path'] = str(path.parent.joinpath('Riot Client').joinpath('RiotClientServices.exe'))
+        else:
+            values['lol_client_path'] = ''
         return values
 
 

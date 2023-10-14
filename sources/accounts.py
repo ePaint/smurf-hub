@@ -1,6 +1,5 @@
-import os
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import Optional, Dict
 from pydantic import BaseModel, Field, validator, root_validator
 from definitions import PROJECT_FOLDER
 
@@ -32,22 +31,28 @@ class Account(BaseModel):
             values['keepass'] = KeepassStatus.NOT_SET
         return values
 
+    @validator('name')
+    def name_validator(cls, v):
+        if not v:
+            raise ValueError('Name must be set')
+        return v
+
     @validator('keepass_reference')
     def keepass_reference_validator(cls, v, values):
         if values['keepass'] == KeepassStatus.ENABLED and not v:
-            raise ValueError('keepass_reference must be set if keepass_enabled is True')
+            raise ValueError('Keepass Reference must be set if you are using keepass')
         return v
 
     @validator('username')
     def username_validator(cls, v, values):
         if values['keepass'] == KeepassStatus.DISABLED and not v:
-            raise ValueError('username must be set if keepass_enabled is False')
+            raise ValueError('Username must be set if you are not using keepass')
         return v
 
     @validator('password')
     def password_validator(cls, v, values):
         if values['keepass'] == KeepassStatus.DISABLED and not v:
-            raise ValueError('password must be set if keepass_enabled is False')
+            raise ValueError('Password must be set if you are not using keepass')
         return v
 
 
