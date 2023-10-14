@@ -7,7 +7,7 @@ from sources.app import AppManager
 APP_MANAGER = AppManager()
 APP_TITLE = 'Smurf Hub'
 EXEC_FOLDER = Path(os.path.dirname(sys.executable))
-EXEC_PATH = str(EXEC_FOLDER.joinpath('main.exe'))
+EXEC_PATH = str(EXEC_FOLDER.joinpath(f'{APP_TITLE}.exe'))
 PROJECT_FOLDER = Path(os.path.dirname(os.path.abspath(__file__)))
 ICON_PATH = str(PROJECT_FOLDER.joinpath('icon.ico'))
 SETTINGS_PATH = str(EXEC_FOLDER.joinpath('settings.json'))
