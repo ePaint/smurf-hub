@@ -237,7 +237,7 @@
     <rect>
      <x>10</x>
      <y>530</y>
-     <width>121</width>
+     <width>101</width>
      <height>51</height>
     </rect>
    </property>
@@ -252,9 +252,9 @@ Start LoL Client</string>
   <widget class="QPushButton" name="restart_lol_client_button">
    <property name="geometry">
     <rect>
-     <x>310</x>
+     <x>230</x>
      <y>530</y>
-     <width>121</width>
+     <width>101</width>
      <height>51</height>
     </rect>
    </property>
@@ -269,9 +269,9 @@ Restart LoL Client</string>
   <widget class="QPushButton" name="stop_lol_client_button">
    <property name="geometry">
     <rect>
-     <x>160</x>
+     <x>120</x>
      <y>530</y>
-     <width>121</width>
+     <width>101</width>
      <height>51</height>
     </rect>
    </property>
@@ -310,6 +310,22 @@ Stop LoL Client</string>
    </property>
    <property name="text">
     <string>📂</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="paypal_button">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>530</y>
+     <width>91</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
    <property name="checkable">
     <bool>false</bool>

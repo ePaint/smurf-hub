@@ -7,7 +7,7 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER
+from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
@@ -36,6 +36,7 @@ class MainWindow(QWidget):
         self.start_lol_client_button: Optional[QPushButton] = None
         self.stop_lol_client_button: Optional[QPushButton] = None
         self.restart_lol_client_button: Optional[QPushButton] = None
+        self.paypal_button: Optional[QPushButton] = None
 
     def start_app(self):
         uic.loadUi(MAIN_UI_PATH, self)
@@ -64,6 +65,10 @@ class MainWindow(QWidget):
         self.start_lol_client_button.clicked.connect(self.start_lol_client)
         self.stop_lol_client_button.clicked.connect(self.stop_lol_client)
         self.restart_lol_client_button.clicked.connect(self.restart_lol_client)
+
+        self.paypal_button.setIcon(QIcon(PAYPAL_IMAGE_PATH))
+        self.paypal_button.setIconSize(self.paypal_button.size() * 0.8)
+        self.paypal_button.clicked.connect(partial(os.startfile, PAYPAL_DONATE_URL))
 
         self.show()
 
