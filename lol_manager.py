@@ -9,7 +9,7 @@ from pykeepass.exceptions import CredentialsError
 from pynput.keyboard import Key, Controller
 from pywinauto import Application, Desktop
 from sources.accounts import ACCOUNTS, Account
-from sources.error_popup import error_popup
+from sources.popup_message import error_popup
 from sources.password_popup import get_password
 from sources.settings import SETTINGS
 

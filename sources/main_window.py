@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidge
 from pydantic import ValidationError
 from win32com.client import Dispatch
 from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE
-from sources.error_popup import error_popup
+from sources.popup_message import error_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
 from lol_manager import login_lol_client, LoginBehavior, start_lol_client, stop_lol_client, restart_lol_client, InvalidSettings
