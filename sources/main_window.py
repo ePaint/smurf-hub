@@ -7,7 +7,7 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH
+from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_FOLDER
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
@@ -43,7 +43,8 @@ class MainWindow(QWidget):
         self.setWindowIcon(QIcon(ICON_PATH))
 
         # Init widgets
-        self.settings_lol_path_input.setText(SETTINGS.lol_path)
+        # self.settings_lol_path_input.setText(SETTINGS.lol_path)
+        self.settings_lol_path_input.setText(EXEC_FOLDER)
         self.settings_lol_path_file_selector_button.clicked.connect(self.select_lol_folder)
 
         self.settings_use_keepass_button.setChecked(SETTINGS.keepass_enabled)
