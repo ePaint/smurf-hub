@@ -1,11 +1,12 @@
 import os
+import sys
 from pathlib import Path
 from sources.app import AppManager
 
 
 APP_MANAGER = AppManager()
 APP_TITLE = 'Smurf Hub'
-PROJECT_FOLDER = Path(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_FOLDER = Path(os.path.dirname(sys.executable))
 ICON_PATH = str(PROJECT_FOLDER.joinpath('icon.ico'))
 SETTINGS_PATH = str(PROJECT_FOLDER.joinpath('settings.json'))
 ACCOUNTS_PATH = str(PROJECT_FOLDER.joinpath('accounts.json'))
