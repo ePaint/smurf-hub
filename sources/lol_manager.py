@@ -140,6 +140,8 @@ def login_lol_client(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETT
         error_popup(message=message)
         return
 
+    sleep(1)
+
     window.set_focus()
     keyboard = Controller()
     keyboard.type(username)
