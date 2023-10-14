@@ -7,7 +7,7 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH
+from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
@@ -226,9 +226,14 @@ class MainWindow(QWidget):
         account = ACCOUNTS.get_account(name)
         if not account:
             return
-        vbs_file_path = str(PROJECT_FOLDER.joinpath('vbs').joinpath(f'{name}-login{"-keepass" if SETTINGS.keepass_enabled else ""}.vbs'))
+
+        if not os.path.exists(VBS_FOLDER):
+            os.makedirs(str(VBS_FOLDER))
+
+        vbs_file_path = str(VBS_FOLDER.joinpath(f'{name}-login{"-keepass" if SETTINGS.keepass_enabled else ""}.vbs'))
         lnk_file_path = str(DESKTOP_PATH.joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
         behavior = 'always_use_keepass' if SETTINGS.keepass_enabled else 'never_use_keepass'
+        message_popup(message=f'Creating shortcut for {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""} in Desktop')
         with open(vbs_file_path, 'w+') as f:
             f.writelines([
                 'Set objShell = CreateObject("WScript.Shell")\n',
