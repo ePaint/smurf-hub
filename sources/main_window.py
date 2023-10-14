@@ -226,8 +226,8 @@ class MainWindow(QWidget):
         account = ACCOUNTS.get_account(name)
         if not account:
             return
+        message_popup(message=f'Desktop: {DESKTOP_PATH}')
         vbs_file_path = str(PROJECT_FOLDER.joinpath('vbs').joinpath(f'{name}-login{"-keepass" if SETTINGS.keepass_enabled else ""}.vbs'))
-        # lnk_file_path = str(PROJECT_FOLDER.joinpath('shortcuts').joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
         lnk_file_path = str(DESKTOP_PATH.joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
         behavior = 'always_use_keepass' if SETTINGS.keepass_enabled else 'never_use_keepass'
         with open(vbs_file_path, 'w+') as f:
