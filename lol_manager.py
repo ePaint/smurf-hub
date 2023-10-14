@@ -9,6 +9,8 @@ from sources.accounts import ACCOUNTS, Account
 from sources.popup_message import error_popup
 from sources.password_popup import get_password
 from sources.settings import SETTINGS
+import ctypes
+ctypes.windll.ole32.CoInitialize()
 
 
 class InvalidSettings(Exception):
