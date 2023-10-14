@@ -13,9 +13,9 @@ def start_app():
 
 
 def login(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS):
-    APP_MANAGER.start(AppSource.PASSWORD_POPUP)
+    # APP_MANAGER.start(AppSource.PASSWORD_POPUP)
     login_lol_client(name=name, behavior=behavior)
-    APP_MANAGER.stop()
+    # APP_MANAGER.stop()
 
 
 def except_hook(cls, exception, traceback):
