@@ -21,8 +21,9 @@ def get_password(title: str = APP_TITLE, message: str = 'Enter KeePass Password:
 
     # if APP_MANAGER.source == AppSource.MAIN_WINDOW:
     #
-    # elif not APP_MANAGER.is_running:
-    APP_MANAGER.start(AppSource.MAIN_WINDOW)
+    if not APP_MANAGER.is_running:
+        APP_MANAGER.start(AppSource.PASSWORD_POPUP)
+        popup.password_input.returnPressed.connect(APP_MANAGER.stop)
 
     popup.exec()
 
