@@ -7,7 +7,7 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH
+from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
@@ -232,8 +232,8 @@ class MainWindow(QWidget):
         with open(vbs_file_path, 'w+') as f:
             f.writelines([
                 'Set objShell = CreateObject("WScript.Shell")\n',
-                f'pythonCommand = """{PYTHON_VENV_PATH}"" ""{LOL_MANAGER_PATH}"" --name ""{name}"" --behavior {behavior}"\n',
-                'objShell.Run pythonCommand, 0, True'
+                f'customCommand = """{EXEC_PATH}"" --name ""{name}"" --behavior {behavior}"\n',
+                'objShell.Run customCommand, 0, True'
             ])
         shell = Dispatch('WScript.Shell')
         shortcut_file = shell.CreateShortCut(lnk_file_path)
