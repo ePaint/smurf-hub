@@ -154,13 +154,3 @@ def login_lol_client(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETT
     keyboard.tap(Key.enter)
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--name', required=True, help='The name of the account to login')
-    parser.add_argument('--behavior', required=False, help='Valid values = [use_keepass, use_settings, never_use_keepass]')
-    args = parser.parse_args()
-    login_lol_client(name=str(args.name), behavior=LoginBehavior(args.behavior))
-
-
-if __name__ == "__main__":
-    main()
