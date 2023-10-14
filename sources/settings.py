@@ -1,10 +1,7 @@
 from pathlib import Path
 from typing import List
 from pydantic import BaseModel, root_validator
-from definitions import PROJECT_FOLDER
-
-
-SETTINGS_PATH = str(PROJECT_FOLDER.joinpath('settings.json'))
+from definitions import SETTINGS_PATH
 
 
 class Settings(BaseModel):

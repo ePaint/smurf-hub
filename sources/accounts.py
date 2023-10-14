@@ -1,10 +1,7 @@
 from enum import Enum
 from typing import Optional, Dict
 from pydantic import BaseModel, Field, validator, root_validator
-from definitions import PROJECT_FOLDER
-
-
-ACCOUNTS_PATH = str(PROJECT_FOLDER.joinpath('accounts.json'))
+from definitions import ACCOUNTS_PATH
 
 
 class KeepassStatus(Enum):
