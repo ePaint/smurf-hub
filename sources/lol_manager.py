@@ -8,6 +8,7 @@ from pynput.keyboard import Key, Controller
 from sources.accounts import ACCOUNTS, Account
 from sources.popup_message import error_popup
 from sources.password_popup import get_password
+from pywinauto import Application, Desktop
 from sources.settings import SETTINGS
 import ctypes
 ctypes.windll.ole32.CoInitialize()
@@ -89,8 +90,6 @@ def stop_lol_client():
 def start_lol_client():
     if not SETTINGS.lol_path:
         raise InvalidSettings('League of Legends path not set')
-
-    from pywinauto import Application, Desktop
 
     try:
         Application(backend='uia').start(SETTINGS.lol_client_path + ' ' + SETTINGS.lol_client_args)
