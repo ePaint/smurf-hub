@@ -40,7 +40,7 @@ class Account(BaseModel):
     @validator('keepass_reference')
     def keepass_reference_validator(cls, v, values):
         if values['keepass'] == KeepassStatus.ENABLED and not v:
-            raise ValueError('Keepass Reference must be set if you are using keepass')
+            raise ValueError('KeePass Reference must be set if you are using keepass')
         return v
 
     @validator('username')

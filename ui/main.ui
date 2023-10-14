@@ -167,7 +167,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Keepass Reference</string>
+    <string>KeePass Reference</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="new_account_username_input">

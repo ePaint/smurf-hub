@@ -62,7 +62,10 @@ def get_credentials(account: Account, behavior: LoginBehavior = LoginBehavior.US
     print(f'get_credentials: use_keepass = {use_keepass}')
     if use_keepass:
         if not SETTINGS.keepass_path:
-            raise InvalidCredentials('Keepass path not set')
+            raise InvalidCredentials('KeePass path not set')
+
+        if not account.keepass_reference:
+            raise InvalidCredentials('KeePass reference not set')
 
         master_key = get_password()
         try:

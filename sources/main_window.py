@@ -7,8 +7,8 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QStyle, QFileDialog
 from pydantic import ValidationError
 from win32com.client import Dispatch
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE
-from sources.popup_message import error_popup
+from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH
+from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
 from lol_manager import login_lol_client, LoginBehavior, start_lol_client, stop_lol_client, restart_lol_client, InvalidSettings
@@ -103,7 +103,7 @@ class MainWindow(QWidget):
 
     def init_accounts_table(self):
         self.accounts_table.setColumnCount(7)
-        self.accounts_table.setHorizontalHeaderLabels(['Name', 'Keepass Ref', 'Username', 'Password', 'Run', 'Link', 'Delete'])
+        self.accounts_table.setHorizontalHeaderLabels(['Name', 'KeePass Reference', 'Username', 'Password', 'Run', 'Link', 'Delete'])
         self.accounts_table.setColumnWidth(0, 84)
         self.accounts_table.setColumnWidth(1, 170)
         self.accounts_table.setColumnWidth(2, 85)
@@ -127,14 +127,17 @@ class MainWindow(QWidget):
 
             execute_button = QPushButton('🚀')
             execute_button.setObjectName(f'execute_button_{i}')
+            execute_button.setToolTip(f'Run League of Legends as {account.name} using {"KeePass" if SETTINGS.keepass_enabled else "username and password"}')
             execute_button.clicked.connect(partial(login_lol_client, account.name, LoginBehavior.USE_SETTINGS))
 
             link_button = QPushButton('📑')
             link_button.setObjectName(f'link_button_{i}')
+            link_button.setToolTip(f'Create shortcut for {account.name} using {"KeePass" if SETTINGS.keepass_enabled else "username and password"}')
             link_button.clicked.connect(partial(self.create_shortcut, account.name))
 
             delete_button = QPushButton('❌️')
             delete_button.setObjectName(f'delete_button_{i}')
+            delete_button.setToolTip(f'Delete {account.name}')
             delete_button.clicked.connect(partial(self.process_delete, i))
 
             self.accounts_table.setCellWidget(i, 4, execute_button)
@@ -224,7 +227,8 @@ class MainWindow(QWidget):
         if not account:
             return
         vbs_file_path = str(PROJECT_FOLDER.joinpath('vbs').joinpath(f'{name}-login{"-keepass" if SETTINGS.keepass_enabled else ""}.vbs'))
-        lnk_file_path = str(PROJECT_FOLDER.joinpath('shortcuts').joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
+        # lnk_file_path = str(PROJECT_FOLDER.joinpath('shortcuts').joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
+        lnk_file_path = str(DESKTOP_PATH.joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
         behavior = 'always_use_keepass' if SETTINGS.keepass_enabled else 'never_use_keepass'
         with open(vbs_file_path, 'w+') as f:
             f.writelines([
@@ -238,6 +242,7 @@ class MainWindow(QWidget):
         shortcut_file.IconLocation = ICON_PATH
         shortcut_file.WindowStyle = 7
         shortcut_file.save()
+        message_popup(message=f'Shortcut created for {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""} in Desktop')
 
     @staticmethod
     def start_lol_client():
