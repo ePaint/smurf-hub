@@ -43,8 +43,7 @@ class MainWindow(QWidget):
         self.setWindowIcon(QIcon(ICON_PATH))
 
         # Init widgets
-        # self.settings_lol_path_input.setText(SETTINGS.lol_path)
-        self.settings_lol_path_input.setText(EXEC_FOLDER)
+        self.settings_lol_path_input.setText(SETTINGS.lol_path)
         self.settings_lol_path_file_selector_button.clicked.connect(self.select_lol_folder)
 
         self.settings_use_keepass_button.setChecked(SETTINGS.keepass_enabled)
