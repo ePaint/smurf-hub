@@ -11,21 +11,14 @@ def get_password(title: str = APP_TITLE, message: str = 'Enter KeePass Password:
     popup.setWindowTitle(title)
     popup.password_label.setText(message)
     popup.setWindowIcon(QIcon(ICON_PATH))
-
     popup.password_input.returnPressed.connect(popup.close)
-
-    # if APP_MANAGER.source != AppSource.MAIN_WINDOW:
-    #     popup.password_input.returnPressed.connect(APP_MANAGER.stop)
-
     popup.show()
 
-    # if APP_MANAGER.source == AppSource.MAIN_WINDOW:
-    #
-    if not APP_MANAGER.is_running:
+    if APP_MANAGER.is_running:
+        popup.exec()
+    else:
         APP_MANAGER.start(AppSource.PASSWORD_POPUP)
         popup.password_input.returnPressed.connect(APP_MANAGER.stop)
-
-    popup.exec()
 
     password = popup.password_input.text()
 
