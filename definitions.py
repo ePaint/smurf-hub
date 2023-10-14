@@ -6,10 +6,11 @@ from sources.app import AppManager
 
 APP_MANAGER = AppManager()
 APP_TITLE = 'Smurf Hub'
-PROJECT_FOLDER = Path(os.path.dirname(sys.executable))
+EXEC_FOLDER = Path(os.path.dirname(sys.executable))
+PROJECT_FOLDER = Path(os.path.dirname(os.path.abspath(__file__)))
 ICON_PATH = str(PROJECT_FOLDER.joinpath('icon.ico'))
-SETTINGS_PATH = str(PROJECT_FOLDER.joinpath('settings.json'))
-ACCOUNTS_PATH = str(PROJECT_FOLDER.joinpath('accounts.json'))
+SETTINGS_PATH = str(EXEC_FOLDER.joinpath('settings.json'))
+ACCOUNTS_PATH = str(EXEC_FOLDER.joinpath('accounts.json'))
 MAIN_UI_PATH = str(PROJECT_FOLDER.joinpath('ui').joinpath('main.ui'))
 PASSWORD_UI_PATH = str(PROJECT_FOLDER.joinpath('ui').joinpath('password.ui'))
 MESSAGE_UI_PATH = str(PROJECT_FOLDER.joinpath('ui').joinpath('message.ui'))
