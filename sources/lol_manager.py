@@ -1,4 +1,3 @@
-import argparse
 import psutil
 from enum import Enum
 from time import sleep
@@ -8,10 +7,10 @@ from pynput.keyboard import Key, Controller
 from sources.accounts import ACCOUNTS, Account
 from sources.popup_message import error_popup
 from sources.password_popup import get_password
-from pywinauto import Application, Desktop
 from sources.settings import SETTINGS
 import ctypes
 ctypes.windll.ole32.CoInitialize()
+from pywinauto import Application, Desktop
 
 
 class InvalidSettings(Exception):
