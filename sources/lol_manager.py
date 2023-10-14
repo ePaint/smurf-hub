@@ -1,4 +1,5 @@
 import psutil
+import sys
 from enum import Enum
 from time import sleep
 from pykeepass import PyKeePass
@@ -10,6 +11,7 @@ from sources.password_popup import get_password
 from sources.settings import SETTINGS
 import ctypes
 ctypes.windll.ole32.CoInitialize()
+sys.coinit_flags = 2
 from pywinauto import Application, Desktop
 
 
