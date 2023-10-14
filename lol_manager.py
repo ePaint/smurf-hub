@@ -2,12 +2,9 @@ import argparse
 import psutil
 from enum import Enum
 from time import sleep
-from tkinter import Tk
-from tkinter.simpledialog import askstring
 from pykeepass import PyKeePass
 from pykeepass.exceptions import CredentialsError
 from pynput.keyboard import Key, Controller
-from pywinauto import Application, Desktop
 from sources.accounts import ACCOUNTS, Account
 from sources.popup_message import error_popup
 from sources.password_popup import get_password
@@ -40,15 +37,6 @@ def get_account(name: str) -> Account:
     if not account:
         raise InvalidAccount(f'Account "{name}" not found')
     return account
-
-
-def get_master_key():
-    root = Tk()
-    root.withdraw()
-    root.wm_attributes('-topmost', 1)
-    master_key = askstring("Password", "Enter password:", show='*', parent=root)
-    root.destroy()
-    return master_key
 
 
 def get_credentials(account: Account, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS) -> (str, str):
@@ -96,9 +84,11 @@ def stop_lol_client():
             process.terminate()
 
 
-def start_lol_client() -> Desktop:
+def start_lol_client():
     if not SETTINGS.lol_path:
         raise InvalidSettings('League of Legends path not set')
+
+    from pywinauto import Application, Desktop
 
     try:
         Application(backend='uia').start(SETTINGS.lol_client_path + ' ' + SETTINGS.lol_client_args)

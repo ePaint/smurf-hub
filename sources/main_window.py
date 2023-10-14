@@ -1,12 +1,12 @@
 import os.path
+from win32com.client import Dispatch
 from functools import partial
 from pathlib import Path
 from typing import Optional
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QStyle, QFileDialog
+from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from win32com.client import Dispatch
 from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
