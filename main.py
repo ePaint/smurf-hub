@@ -24,9 +24,9 @@ def main():
     parser.add_argument('--behavior', required=False, help='Valid values = [use_keepass, use_settings, never_use_keepass]')
     args = parser.parse_args()
     name = str(args.name)
+    behavior = LoginBehavior(args.behavior) if args.behavior else LoginBehavior.USE_SETTINGS
 
     if name:
-        behavior = LoginBehavior(args.behavior)
         login_lol_client(name=name, behavior=behavior)
     else:
         start_app()
