@@ -7,9 +7,15 @@ from sources.main_window import MainWindow
 
 
 def start_app():
+    APP_MANAGER.start(AppSource.MAIN_WINDOW)
     window = MainWindow()
     window.start_app()
-    APP_MANAGER.start(AppSource.MAIN_WINDOW)
+
+
+def login(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS):
+    APP_MANAGER.start(AppSource.PASSWORD_POPUP)
+    login_lol_client(name=name, behavior=behavior)
+    APP_MANAGER.stop()
 
 
 def except_hook(cls, exception, traceback):
@@ -27,7 +33,7 @@ def main():
     if args.name:
         name = str(args.name)
         behavior = LoginBehavior(args.behavior) if args.behavior else LoginBehavior.USE_SETTINGS
-        login_lol_client(name=name, behavior=behavior)
+        login(name=name, behavior=behavior)
     else:
         start_app()
 
