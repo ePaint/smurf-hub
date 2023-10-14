@@ -7,9 +7,9 @@ from sources.main_window import MainWindow
 
 
 def start_app():
-    APP_MANAGER.start(AppSource.MAIN_WINDOW)
     window = MainWindow()
     window.start_app()
+    APP_MANAGER.start(AppSource.MAIN_WINDOW)
 
 
 def login(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS):
