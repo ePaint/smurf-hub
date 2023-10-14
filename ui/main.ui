@@ -316,6 +316,22 @@ Stop LoL Client</string>
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>settings_lol_path_input</tabstop>
+  <tabstop>settings_lol_path_file_selector_button</tabstop>
+  <tabstop>settings_use_keepass_button</tabstop>
+  <tabstop>settings_keepass_path_input</tabstop>
+  <tabstop>settings_keepass_path_file_selector_button</tabstop>
+  <tabstop>new_account_name_input</tabstop>
+  <tabstop>new_account_keepass_reference_input</tabstop>
+  <tabstop>new_account_username_input</tabstop>
+  <tabstop>new_account_password_input</tabstop>
+  <tabstop>new_account_add_button</tabstop>
+  <tabstop>accounts_table</tabstop>
+  <tabstop>start_lol_client_button</tabstop>
+  <tabstop>stop_lol_client_button</tabstop>
+  <tabstop>restart_lol_client_button</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
