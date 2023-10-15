@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Optional
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
+from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog, QCheckBox
 from pydantic import ValidationError
 from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL
 from sources.popup_message import error_popup, message_popup
@@ -19,7 +19,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.settings_lol_path_input: Optional[QLineEdit] = None
         self.settings_lol_path_file_selector_button: Optional[QPushButton] = None
-        self.settings_use_keepass_button: Optional[QPushButton] = None
+        self.settings_keepass_checkbox: Optional[QCheckBox] = None
         self.settings_keepass_path_label: Optional[QLabel] = None
         self.settings_keepass_path_input: Optional[QLineEdit] = None
         self.settings_keepass_path_file_selector_button: Optional[QPushButton] = None
@@ -47,13 +47,13 @@ class MainWindow(QWidget):
         self.settings_lol_path_input.setText(SETTINGS.lol_path)
         self.settings_lol_path_file_selector_button.clicked.connect(self.select_lol_folder)
 
-        self.settings_use_keepass_button.setChecked(SETTINGS.keepass_enabled)
+        self.settings_keepass_checkbox.setChecked(SETTINGS.keepass_enabled)
         self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
         self.settings_keepass_path_file_selector_button.clicked.connect(self.select_keepass_file)
 
         self.settings_lol_path_input.returnPressed.connect(self.save_settings)
-        self.settings_use_keepass_button.clicked.connect(self.toggle_keepass)
-        self.settings_use_keepass_button.clicked.connect(self.save_settings)
+        self.settings_keepass_checkbox.clicked.connect(self.toggle_keepass)
+        self.settings_keepass_checkbox.clicked.connect(self.save_settings)
         self.settings_keepass_path_input.returnPressed.connect(self.save_settings)
 
         self.new_account_add_button.clicked.connect(self.add_account)
@@ -116,7 +116,7 @@ class MainWindow(QWidget):
         self.accounts_table.setColumnWidth(3, 85)
         self.accounts_table.setColumnWidth(4, 50)
         self.accounts_table.setColumnWidth(5, 50)
-        self.accounts_table.setColumnWidth(6, 50)
+        self.accounts_table.setColumnWidth(6, 52)
         self.update_accounts_table()
 
     def update_accounts_table(self):
@@ -181,27 +181,23 @@ class MainWindow(QWidget):
         ACCOUNTS.save()
 
     def toggle_keepass(self):
-        SETTINGS.keepass_enabled = self.settings_use_keepass_button.isChecked()
+        SETTINGS.keepass_enabled = self.settings_keepass_checkbox.isChecked()
         self.setWindowTitle(APP_TITLE + ' (KeePass)' if SETTINGS.keepass_enabled else APP_TITLE)
 
-        style = 'color: #999999;' if not SETTINGS.keepass_enabled else ''
-        inverted_style = 'color: #999999;' if SETTINGS.keepass_enabled else ''
-        self.settings_keepass_path_label.setStyleSheet(style)
-        self.new_account_keepass_reference_label.setStyleSheet(style)
-        self.new_account_username_label.setStyleSheet(inverted_style)
-        self.new_account_password_label.setStyleSheet(inverted_style)
-
-        self.settings_keepass_path_input.setStyleSheet(style)
-        self.settings_keepass_path_file_selector_button.setStyleSheet(style)
-        self.new_account_keepass_reference_input.setStyleSheet(style)
-        self.new_account_username_input.setStyleSheet(inverted_style)
-        self.new_account_password_input.setStyleSheet(inverted_style)
-
+        self.settings_keepass_path_label.setDisabled(not SETTINGS.keepass_enabled)
         self.settings_keepass_path_input.setDisabled(not SETTINGS.keepass_enabled)
+
         self.settings_keepass_path_file_selector_button.setDisabled(not SETTINGS.keepass_enabled)
+
+        self.new_account_keepass_reference_label.setDisabled(not SETTINGS.keepass_enabled)
         self.new_account_keepass_reference_input.setDisabled(not SETTINGS.keepass_enabled)
+
+        self.new_account_username_label.setDisabled(SETTINGS.keepass_enabled)
         self.new_account_username_input.setDisabled(SETTINGS.keepass_enabled)
+
+        self.new_account_password_label.setDisabled(SETTINGS.keepass_enabled)
         self.new_account_password_input.setDisabled(SETTINGS.keepass_enabled)
+
         self.update_accounts_table()
 
     def save_settings(self):
