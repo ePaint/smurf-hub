@@ -62,6 +62,7 @@ QLineEdit {
 QLineEdit::disabled {
 	border: 1px solid #19302e;
     background-color: #0c1718;
+	color: #19302e;
 }
 
 /* Style for QPushButton (adjust background, text color, and squared borders) */
