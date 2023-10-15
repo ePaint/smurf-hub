@@ -105,7 +105,7 @@ class MainWindow(QWidget):
         ACCOUNTS.add(account)
         ACCOUNTS.save()
         self.update_accounts_table()
-        self.new_account_add_button.setFocus()
+        self.new_account_name_input.setFocus()
 
     def init_accounts_table(self):
         self.accounts_table.setColumnCount(7)
