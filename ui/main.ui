@@ -48,7 +48,7 @@ QLabel::disabled {
 QLabel#accounts_header, QLabel#settings_header {
     color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #30584f, stop: 1 #44605b);
     font-weight: bold; /* Make the font thick */
-    font-size: 18px; /* Adjust the font size as needed */
+    font-size: 16px; /* Adjust the font size as needed */
 }
 
 /* Style for QLineEdit (adjust border, background, and text color) */
