@@ -29,12 +29,10 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">/* Set the background color for all widgets */
-QWidget {
+   <string notr="true">QWidget {
     background-color: #0d1819;
 }
 
-/* Style for QLabel (adjust fonts and text color) */
 QLabel {
     color: #858261;
     font-size: 12px;
@@ -44,14 +42,12 @@ QLabel::disabled {
     color: #19302e;
 }
 
-/* Style for QLabel */
 QLabel#accounts_header, QLabel#settings_header {
     color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #30584f, stop: 1 #44605b);
-    font-weight: bold; /* Make the font thick */
-    font-size: 16px; /* Adjust the font size as needed */
+    font-weight: bold;
+    font-size: 16px;
 }
 
-/* Style for QLineEdit (adjust border, background, and text color) */
 QLineEdit {
 	font-size: 12px;
     border: 1px solid #858261;
@@ -65,12 +61,10 @@ QLineEdit::disabled {
 	color: #19302e;
 }
 
-/* Style for QPushButton (adjust background, text color, and squared borders) */
 QPushButton {
     background: qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #132326, stop: 0.4 #193233, stop: 1 #254b41);
     color: #858261;
-    border: 2px solid #858261; /* Squared border */
-    /* border-radius: 0px; */
+    border: 2px solid #858261;
     font-size: 14px;
     padding: 0px;
 }
@@ -79,7 +73,6 @@ QPushButton#paypal_button:hover {
     background: #ffffff;
 }
 
-/* Style for QPushButton (adjust background, text color, and squared borders) */
 QPushButton::disabled {
     background: #213a38;
     color: #19302e;
@@ -87,37 +80,32 @@ QPushButton::disabled {
     background-color: #0c1718;
 }
 
-/* Change QPushButton appearance on hover and pressed states */
 QPushButton::enabled:hover {
     background-color: #0c1718;
 }
 
 QPushButton::enabled:pressed {
     background-color: #0c1718;
-    color: #858261; /* Restore text color on press */
+    color: #858261;
 }
 
-/* Style for QTableWidget (adjust border and row height) */
 QTableWidget {
     border: 1px solid #858261;
     alternate-background-color: #213a38;
-    color: #858261; /* Text color for table cells */
+    color: #858261;
 }
 
-/* Style for table header (adjust fonts, background color, and text color) */
 QHeaderView::section {
     background-color: #0c1718;
     color: #858261;
     font-size: 14px;
-    font-weight: bold; /* Set the font weight to normal for the header */
+    font-weight: bold;
 }
 
-/* Style for QScrollBar (adjust background, handle, and border colors) */
 QScrollBar:vertical {
-    background: rgba(11, 20, 16, 128); /* Slightly transparent background */
-    border: 2px solid transparent; /* Thicker border for main scroll bar */
+    background: rgba(11, 20, 16, 128);
+    border: 2px solid transparent;
 
-    /* Hide the arrow buttons by setting their width to zero */
     QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
         width: 0;
 		height: 0;
@@ -125,13 +113,12 @@ QScrollBar:vertical {
 }
 
 QScrollBar::handle:vertical {
-    background: rgba(11, 20, 16, 128); /* Slightly transparent background */
-    border: 1px solid #858261; /* Border for thumb */
+    background: rgba(11, 20, 16, 128);
+    border: 1px solid #858261;
 }
 
-/* Change QPushButton appearance on hover and pressed states */
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-    background: rgba(11, 20, 16, 128); /* Slightly transparent background */
+    background: rgba(11, 20, 16, 128);
 }
 
 QScrollBar::add-line:vertical {
@@ -146,16 +133,14 @@ QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
 	height: 0px;
 }
 
-/* Style for QCheckBox */
 QCheckBox {
-    spacing: 5px; /* Adjust the spacing between the checkbox and text if needed */
+    spacing: 5px;
 }
 
-/* Style for QCheckBox label text */
 QCheckBox::indicator {
-    color: #858261; /* Text color for the checkbox label */
-    width: 12px; /* Adjust the width for square checkboxes */
-    height: 12px; /* Adjust the height for square checkboxes */
+    color: #858261;
+    width: 12px;
+    height: 12px;
 	border: 1px solid #858261;
 }
 

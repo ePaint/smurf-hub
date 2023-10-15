@@ -13,6 +13,34 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QDialog {
+    background-color: #0d1819;
+}
+
+QLabel {
+    color: #858261;
+    font-size: 12px;
+}
+
+QPushButton {
+	border: 2px solid #858261;
+    background: qlineargradient(x1: 0, y1: 1, x2: 0, y2: 0, stop: 0 #132326, stop: 0.4 #193233, stop: 1 #254b41);
+    color: #858261;
+    font-size: 14px;
+	width: 100px;
+}
+
+
+QPushButton::enabled:hover {
+    background-color: #0c1718;
+}
+
+QPushButton::enabled:pressed {
+    background-color: #0c1718;
+    color: #858261;
+}</string>
+  </property>
   <widget class="QDialogButtonBox" name="ok_button">
    <property name="geometry">
     <rect>
