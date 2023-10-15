@@ -231,6 +231,12 @@
      <height>281</height>
     </rect>
    </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOn</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
   </widget>
   <widget class="QPushButton" name="start_lol_client_button">
    <property name="geometry">
