@@ -53,10 +53,10 @@ QLabel#accounts_header, QLabel#settings_header {
 
 /* Style for QLineEdit (adjust border, background, and text color) */
 QLineEdit {
+	font-size: 12px;
     border: 1px solid #858261;
     background-color: #213a38;
     color: #858261;
-    padding: 5px;
 }
 
 QLineEdit::disabled {
@@ -192,7 +192,7 @@ QCheckBox::indicator:checked {
      <x>140</x>
      <y>110</y>
      <width>271</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
