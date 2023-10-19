@@ -1,6 +1,7 @@
 import argparse
 import sys
 from definitions import APP_MANAGER
+from sources.keepass import KEEPASS
 from sources.app import AppSource
 from sources.lol_manager import login_lol_client
 from sources.main_window import MainWindow
@@ -22,6 +23,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--account-id', required=False, help='The account_id of the account to login')
     args = parser.parse_args()
+    KEEPASS.load()
 
     if args.account_id:
         login_lol_client(account_id=str(args.account_id))
