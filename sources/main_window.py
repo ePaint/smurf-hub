@@ -8,7 +8,7 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL
+from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, EXEC_FOLDER
 from sources.keepass import KeePassException, KeePassField, KEEPASS
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
@@ -20,6 +20,8 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         message_popup(message=EXEC_PATH)
+        message_popup(message=str(EXEC_FOLDER))
+
 
         # Init widgets
         self.settings_lol_path_input: Optional[QLineEdit] = None

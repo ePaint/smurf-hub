@@ -6,10 +6,10 @@ from sources.app import AppManager
 APP_MANAGER: AppManager = AppManager()
 APP_TITLE = 'Smurf Hub'
 EXEC_FOLDER = Path(os.path.dirname(sys.executable))
-EXEC_PATH = str(EXEC_FOLDER.joinpath(f'{APP_TITLE}.exe'))
 PROJECT_FOLDER = Path(os.path.dirname(os.path.abspath(__file__)))
-KEEPASS_CREATE_PATH = str(EXEC_FOLDER.joinpath(f'{APP_TITLE}.kdbx'))
 PAYPAL_DONATE_URL = 'https://www.paypal.com/donate/?hosted_button_id=ASL33HJH2PR98'
+EXEC_PATH = str(EXEC_FOLDER.joinpath(f'{APP_TITLE}.exe'))
+KEEPASS_CREATE_PATH = str(EXEC_FOLDER.joinpath(f'{APP_TITLE}.kdbx'))
 SETTINGS_PATH = str(EXEC_FOLDER.joinpath('settings.json'))
 ACCOUNTS_PATH = str(EXEC_FOLDER.joinpath('accounts.json'))
 VBS_FOLDER = EXEC_FOLDER.joinpath('utils')
