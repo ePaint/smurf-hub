@@ -44,9 +44,6 @@ class MainWindow(QWidget):
         self.paypal_button: Optional[QPushButton] = None
 
     def start_app(self):
-        # Load keepass database
-        KEEPASS.load()
-
         # Load UI
         uic.loadUi(MAIN_UI_PATH, self)
         self.setWindowTitle(APP_TITLE)

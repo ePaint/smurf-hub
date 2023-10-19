@@ -40,7 +40,6 @@ class KeePass:
         self.group: Optional[Group] = None
 
     def load(self):
-        return
         if self.database is not None:
             return
 

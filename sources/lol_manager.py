@@ -29,7 +29,6 @@ class InvalidCredentials(Exception):
 
 
 def get_account(account_id: str) -> Account:
-    KEEPASS.load()
     account: Account = KEEPASS.get_account(account_id=account_id)
     if not account:
         raise InvalidAccount(f'Account "{account_id}" not found')
