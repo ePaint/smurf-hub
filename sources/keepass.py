@@ -8,6 +8,7 @@ from pykeepass.group import Group
 from definitions import APP_TITLE, KEEPASS_CREATE_PATH
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
+from sources.popup_message import message_popup
 from sources.settings import SETTINGS
 from uuid import UUID
 
@@ -80,6 +81,7 @@ class KeePass:
         except InvalidPassword:
             return 'test'
 
+        message_popup(KEEPASS_CREATE_PATH)
         try:
             self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
             self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
