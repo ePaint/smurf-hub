@@ -19,9 +19,6 @@ from sources.lol_manager import login_lol_client, start_lol_client, stop_lol_cli
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
-        message_popup(message=EXEC_PATH)
-        message_popup(message=str(EXEC_FOLDER))
-        message_popup(message=KEEPASS_CREATE_PATH)
 
         # Init widgets
         self.settings_lol_path_input: Optional[QLineEdit] = None
