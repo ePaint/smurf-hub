@@ -77,7 +77,7 @@ class KeePass:
         message_popup(message=EXEC_FOLDER)
         message_popup(message=EXEC_PATH)
         message_popup(message=KEEPASS_CREATE_PATH)
-        return
+        return 'test'
 
         if os.path.exists(KEEPASS_CREATE_PATH):
             raise KeePassException('KeePass file already exists')
