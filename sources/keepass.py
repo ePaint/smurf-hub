@@ -40,6 +40,7 @@ class KeePass:
         self.group: Optional[Group] = None
 
     def load(self):
+        return
         if self.database is not None:
             return
 
@@ -85,7 +86,6 @@ class KeePass:
             self.master_key = get_password(message='Enter KeePass master key:')
         except InvalidPassword:
             return 'test'
-
 
         try:
             self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
