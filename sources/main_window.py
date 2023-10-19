@@ -19,6 +19,7 @@ from sources.lol_manager import login_lol_client, LoginBehavior, start_lol_clien
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+        message_popup(message=EXEC_PATH)
 
         # Init widgets
         self.settings_lol_path_input: Optional[QLineEdit] = None
