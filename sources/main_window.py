@@ -99,9 +99,9 @@ class MainWindow(QWidget):
 
     def create_keepass_file(self):
         try:
-            message_popup(EXEC_PATH)
-            message_popup(KEEPASS_CREATE_PATH)
-            message_popup(str(EXEC_FOLDER))
+            message_popup(message=EXEC_PATH)
+            message_popup(message=KEEPASS_CREATE_PATH)
+            message_popup(message=str(EXEC_FOLDER))
             SETTINGS.keepass_path = KEEPASS.create()
         except KeePassException as e:
             error_popup(message=str(e))

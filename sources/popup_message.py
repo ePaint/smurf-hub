@@ -5,11 +5,11 @@ from definitions import ICON_PATH, ICON_ERROR_PATH, MESSAGE_UI_PATH, APP_TITLE, 
 from sources.app import AppSource
 
 
-def error_popup(title: str = APP_TITLE + ' - Error', message: str = 'Error'):
-    message_popup(title=title, message=message, icon=ICON_ERROR_PATH)
+def error_popup(message: str = 'Error', title: str = APP_TITLE + ' - Error'):
+    message_popup(message=message, title=title, icon=ICON_ERROR_PATH)
 
 
-def message_popup(title: str = APP_TITLE, message: str = '', icon: str = ICON_PATH):
+def message_popup(message: str = '', title: str = APP_TITLE, icon: str = ICON_PATH):
     popup = QDialog()
     uic.loadUi(MESSAGE_UI_PATH, popup)
     popup.setWindowTitle(title)
