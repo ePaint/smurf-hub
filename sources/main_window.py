@@ -8,12 +8,12 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, EXEC_FOLDER
+from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, EXEC_FOLDER, KEEPASS_CREATE_PATH
 from sources.keepass import KeePassException, KeePassField, KEEPASS
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
 from sources.accounts import Account
-from sources.lol_manager import login_lol_client, LoginBehavior, start_lol_client, stop_lol_client, restart_lol_client, InvalidSettings
+from sources.lol_manager import login_lol_client, start_lol_client, stop_lol_client, restart_lol_client, InvalidSettings
 
 
 class MainWindow(QWidget):
@@ -21,7 +21,7 @@ class MainWindow(QWidget):
         super().__init__()
         message_popup(message=EXEC_PATH)
         message_popup(message=str(EXEC_FOLDER))
-
+        message_popup(message=KEEPASS_CREATE_PATH)
 
         # Init widgets
         self.settings_lol_path_input: Optional[QLineEdit] = None

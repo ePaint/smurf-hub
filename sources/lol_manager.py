@@ -28,12 +28,6 @@ class InvalidCredentials(Exception):
         super().__init__(message)
 
 
-class LoginBehavior(Enum):
-    USE_SETTINGS = 'use_settings'  # Check settings to see if keepass should be used (default)
-    USE_KEEPASS = 'use_keepass'
-    USE_CREDENTIALS = 'use_credentials'
-
-
 def get_account(account_id: str) -> Account:
     KEEPASS.load()
     account: Account = KEEPASS.get_account(account_id=account_id)
