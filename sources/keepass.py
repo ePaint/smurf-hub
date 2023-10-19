@@ -92,11 +92,12 @@ class KeePass:
             return 'test'
 
         try:
-            message_popup(message=KEEPASS_CREATE_PATH)
+            # message_popup(message=KEEPASS_CREATE_PATH)
             # self.database = PyKeePass(KEEPASS_CREATE_PATH, password=self.master_key)
             # save to temporary file to prevent database clobbering
             # see issues 223, 101
             filename_tmp = Path(KEEPASS_CREATE_PATH).with_suffix('.tmp')
+            message_popup(message=str(filename_tmp))
             try:
                 KDBX.build_file(
                     self.database,
@@ -104,9 +105,11 @@ class KeePass:
                     password=self.master_key,
                 )
             except Exception as e:
-                os.remove(filename_tmp)
+                # os.remove(filename_tmp)
                 raise e
+            message_popup(message='Successfully created tmp file')
             shutil.move(filename_tmp, KEEPASS_CREATE_PATH)
+            message_popup(message='Successfully moved tmp file')
 
             # self.database = create_database(Path(KEEPASS_CREATE_PATH), password=self.master_key)
             message_popup(message=self.database.filename)
