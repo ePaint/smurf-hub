@@ -1,6 +1,7 @@
 import os
 from enum import Enum
 from typing import Optional
+from sources.settings import SETTINGS
 from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
@@ -9,7 +10,6 @@ from definitions import APP_TITLE, KEEPASS_CREATE_PATH, EXEC_FOLDER, EXEC_PATH
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
 from sources.popup_message import message_popup
-from sources.settings import SETTINGS
 from uuid import UUID
 
 
