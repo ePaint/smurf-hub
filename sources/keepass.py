@@ -78,18 +78,19 @@ class KeePass:
         raise KeePassException('Invalid master key')
 
     def create(self) -> str:
-        message_popup(message=str(EXEC_FOLDER))
-        message_popup(message=EXEC_PATH)
+        # message_popup(message=str(EXEC_FOLDER))
+        # message_popup(message=EXEC_PATH)
         message_popup(message=KEEPASS_CREATE_PATH)
 
         if os.path.exists(KEEPASS_CREATE_PATH):
             raise KeePassException('KeePass file already exists')
 
-        try:
-            self.master_key = get_password(message='Enter KeePass master key:')
-            message_popup(message=f'"{self.master_key}"')
-        except InvalidPassword:
-            return 'test'
+        # try:
+        #     self.master_key = get_password(message='Enter KeePass master key:')
+        #     message_popup(message=f'"{self.master_key}"')
+        # except InvalidPassword:
+        #     return 'test'
+        self.master_key = 'test'
 
         try:
             # message_popup(message=KEEPASS_CREATE_PATH)
@@ -105,6 +106,7 @@ class KeePass:
                     password=self.master_key,
                 )
             except Exception as e:
+                message_popup(message=str(e))
                 # os.remove(filename_tmp)
                 raise e
             message_popup(message='Successfully created tmp file')
