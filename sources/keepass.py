@@ -96,7 +96,9 @@ class KeePass:
             KDBX.build_stream(
                 self.database,
                 KEEPASS_CREATE_PATH,
-                password=self.master_key
+                password=self.master_key,
+                keyfile=None,
+                transformed_key=None
             )
             # message_popup(message=KEEPASS_CREATE_PATH)
             # self.database = PyKeePass(KEEPASS_CREATE_PATH, password=self.master_key)
