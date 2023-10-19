@@ -93,30 +93,35 @@ class KeePass:
         self.master_key = 'test'
 
         try:
+            KDBX.build_stream(
+                self.database,
+                KEEPASS_CREATE_PATH,
+                password=self.master_key
+            )
             # message_popup(message=KEEPASS_CREATE_PATH)
             # self.database = PyKeePass(KEEPASS_CREATE_PATH, password=self.master_key)
             # save to temporary file to prevent database clobbering
             # see issues 223, 101
-            filename_tmp = Path(KEEPASS_CREATE_PATH).with_suffix('.tmp')
-            message_popup(message=str(filename_tmp))
-            try:
-                KDBX.build_file(
-                    self.database,
-                    filename_tmp,
-                    password=self.master_key,
-                )
-            except Exception as e:
-                message_popup(message=str(e))
-                # os.remove(filename_tmp)
-                raise e
-            message_popup(message='Successfully created tmp file')
-            shutil.move(filename_tmp, KEEPASS_CREATE_PATH)
-            message_popup(message='Successfully moved tmp file')
+            # filename_tmp = Path(KEEPASS_CREATE_PATH).with_suffix('.tmp')
+            # message_popup(message=str(filename_tmp))
+            # try:
+            #     KDBX.build_file(
+            #         self.database,
+            #         filename_tmp,
+            #         password=self.master_key,
+            #     )
+            # except Exception as e:
+            #     message_popup(message=str(e))
+            #     # os.remove(filename_tmp)
+            #     raise e
+            # message_popup(message='Successfully created tmp file')
+            # shutil.move(filename_tmp, KEEPASS_CREATE_PATH)
+            # message_popup(message='Successfully moved tmp file')
 
             # self.database = create_database(Path(KEEPASS_CREATE_PATH), password=self.master_key)
             message_popup(message=self.database.filename)
-            self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
-            self.database.save()
+            # self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
+            # self.database.save()
         except Exception as e:
             return str(e)
         except:
