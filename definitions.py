@@ -8,12 +8,12 @@ APP_TITLE = 'Smurf Hub'
 EXEC_FOLDER = Path(os.path.dirname(sys.executable))
 EXEC_PATH = str(EXEC_FOLDER.joinpath(f'{APP_TITLE}.exe'))
 PROJECT_FOLDER = Path(os.path.dirname(os.path.abspath(__file__)))
-PAYPAL_IMAGE_PATH = str(PROJECT_FOLDER.joinpath('paypal.png'))
 PAYPAL_DONATE_URL = 'https://www.paypal.com/donate/?hosted_button_id=ASL33HJH2PR98'
 SETTINGS_PATH = str(EXEC_FOLDER.joinpath('settings.json'))
 ACCOUNTS_PATH = str(EXEC_FOLDER.joinpath('accounts.json'))
 VBS_FOLDER = EXEC_FOLDER.joinpath('utils')
 UI_FOLDER = PROJECT_FOLDER.joinpath('ui')
+PAYPAL_IMAGE_PATH = str(UI_FOLDER.joinpath('paypal.png'))
 ICON_PATH = str(UI_FOLDER.joinpath('icon.ico'))
 ICON_ERROR_PATH = str(UI_FOLDER.joinpath('icon_error.ico'))
 MAIN_UI_PATH = str(UI_FOLDER.joinpath('main.ui'))
