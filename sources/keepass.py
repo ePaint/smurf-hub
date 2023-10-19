@@ -5,7 +5,7 @@ from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
 from pykeepass.group import Group
-from definitions import APP_TITLE, KEEPASS_CREATE_PATH
+from definitions import APP_TITLE, KEEPASS_CREATE_PATH, EXEC_FOLDER, EXEC_PATH
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
 from sources.popup_message import message_popup
@@ -76,6 +76,8 @@ class KeePass:
         if os.path.exists(KEEPASS_CREATE_PATH):
             raise KeePassException('KeePass file already exists')
 
+        message_popup(EXEC_FOLDER)
+        message_popup(EXEC_PATH)
         message_popup(KEEPASS_CREATE_PATH)
         return ''
 
