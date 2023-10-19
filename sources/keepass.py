@@ -87,6 +87,7 @@ class KeePass:
             return 'test'
 
         try:
+            message_popup(message=KEEPASS_CREATE_PATH)
             self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
             message_popup(message=self.database.filename)
             self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
