@@ -80,7 +80,7 @@ class KeePass:
     def create(self) -> str:
         # message_popup(message=str(EXEC_FOLDER))
         # message_popup(message=EXEC_PATH)
-        message_popup(message=KEEPASS_CREATE_PATH)
+        print(KEEPASS_CREATE_PATH)
 
         if os.path.exists(KEEPASS_CREATE_PATH):
             raise KeePassException('KeePass file already exists')
@@ -93,13 +93,26 @@ class KeePass:
         self.master_key = 'test'
 
         try:
-            KDBX.build_stream(
-                self.database,
-                KEEPASS_CREATE_PATH,
-                password=self.master_key,
-                keyfile=None,
-                transformed_key=None
-            )
+            # KDBX.parse_file(
+            #     KEEPASS_CREATE_PATH,
+            #     password=self.master_key,
+            #     keyfile=None,
+            #     transformed_key=None
+            # )
+            # KDBX.build_file(
+            #     self.database,
+            #     KEEPASS_CREATE_PATH,
+            #     password=self.master_key,
+            #     keyfile=None,
+            #     transformed_key=None
+            # )
+            # KDBX.build_stream(
+            #     self.database,
+            #     KEEPASS_CREATE_PATH,
+            #     password=self.master_key,
+            #     keyfile=None,
+            #     transformed_key=None
+            # )
             # message_popup(message=KEEPASS_CREATE_PATH)
             # self.database = PyKeePass(KEEPASS_CREATE_PATH, password=self.master_key)
             # save to temporary file to prevent database clobbering
@@ -120,11 +133,12 @@ class KeePass:
             # shutil.move(filename_tmp, KEEPASS_CREATE_PATH)
             # message_popup(message='Successfully moved tmp file')
 
-            # self.database = create_database(Path(KEEPASS_CREATE_PATH), password=self.master_key)
+            self.database = create_database(Path(KEEPASS_CREATE_PATH), password=self.master_key)
             message_popup(message=self.database.filename)
-            # self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
-            # self.database.save()
+            self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
+            self.database.save()
         except Exception as e:
+            # raise e
             return str(e)
         except:
             return 'Unknown error'
