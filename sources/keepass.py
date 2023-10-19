@@ -1,16 +1,13 @@
 import os
 from enum import Enum
 from typing import Optional
-
 from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
 from pykeepass.group import Group
-
 from definitions import EXEC_FOLDER, APP_TITLE
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
-from sources.popup_message import error_popup
 from sources.settings import SETTINGS
 from uuid import UUID
 

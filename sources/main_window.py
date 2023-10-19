@@ -1,23 +1,18 @@
 import os.path
-
 from PyQt6.QtCore import Qt
-from pykeepass import PyKeePass, create_database
-from pykeepass.exceptions import CredentialsError
 from win32com.client import Dispatch
 from functools import partial
 from pathlib import Path
 from typing import Optional
 from PyQt6 import uic
 from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog, QCheckBox
+from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, EXEC_FOLDER
-from sources.keepass import KeePass, KeePassException, KeePassField, KEEPASS
-from sources.password_field import PasswordWidget
-from sources.password_popup import get_password, InvalidPassword
+from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL
+from sources.keepass import KeePassException, KeePassField, KEEPASS
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
-from sources.accounts import ACCOUNTS, Account, Accounts
+from sources.accounts import Account
 from sources.lol_manager import login_lol_client, LoginBehavior, start_lol_client, stop_lol_client, restart_lol_client, InvalidSettings
 
 
@@ -157,10 +152,6 @@ class MainWindow(QWidget):
 
     def save_accounts_table_changes(self, row, col):
         self.accounts_table.cellChanged.disconnect()
-
-        print('RUNNING SAVE ACCOUNTS TABLE CHANGES...')
-        print(f'ROW: {row}, COL: {col}')
-
         new_value = self.accounts_table.item(row, col).text() or None
 
         field = None

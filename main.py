@@ -2,7 +2,7 @@ import argparse
 import sys
 from definitions import APP_MANAGER
 from sources.app import AppSource
-from sources.lol_manager import login_lol_client, LoginBehavior
+from sources.lol_manager import login_lol_client
 from sources.main_window import MainWindow
 
 

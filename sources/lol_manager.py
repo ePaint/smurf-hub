@@ -2,13 +2,10 @@ import psutil
 import sys
 from enum import Enum
 from time import sleep
-from pykeepass import PyKeePass
-from pykeepass.exceptions import CredentialsError
 from pynput.keyboard import Key, Controller
-from sources.accounts import ACCOUNTS, Account
-from sources.keepass import KeePass, KEEPASS
+from sources.accounts import Account
+from sources.keepass import KEEPASS
 from sources.popup_message import error_popup
-from sources.password_popup import get_password, InvalidPassword
 from sources.settings import SETTINGS
 import ctypes
 ctypes.windll.ole32.CoInitialize()
@@ -118,5 +115,3 @@ def login_lol_client(account_id: str):
     keyboard.tap(Key.tab)
     keyboard.tap(Key.tab)
     keyboard.tap(Key.enter)
-
-
