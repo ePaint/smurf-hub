@@ -8,7 +8,7 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
-from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, EXEC_FOLDER, KEEPASS_CREATE_PATH
+from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, EXEC_FOLDER, KEEPASS_CREATE_PATH, UTILS_FOLDER
 from sources.keepass import KeePassException, KeePassField, KEEPASS
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
@@ -202,10 +202,10 @@ class MainWindow(QWidget):
 
     @staticmethod
     def create_shortcut(account_id: str, title: str):
-        if not os.path.exists(VBS_FOLDER):
-            os.makedirs(str(VBS_FOLDER))
+        if not os.path.exists(UTILS_FOLDER):
+            os.makedirs(str(UTILS_FOLDER))
 
-        vbs_file_path = str(VBS_FOLDER.joinpath(f'{title}-login.vbs'))
+        vbs_file_path = str(UTILS_FOLDER.joinpath(f'{title}-login.vbs'))
         lnk_file_path = str(DESKTOP_PATH.joinpath(f'Start LoL as {title}.lnk'))
         with open(vbs_file_path, 'w+') as f:
             f.writelines([

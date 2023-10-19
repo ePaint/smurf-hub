@@ -5,13 +5,14 @@ from pathlib import Path
 from typing import Optional
 
 from pykeepass.kdbx_parsing import KDBX
+from pykeepass.pykeepass import BLANK_DATABASE_PASSWORD
 
 from sources.settings import SETTINGS
 from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
 from pykeepass.group import Group
-from definitions import APP_TITLE, KEEPASS_CREATE_PATH, EXEC_FOLDER, EXEC_PATH
+from definitions import APP_TITLE, KEEPASS_CREATE_PATH, EXEC_FOLDER, EXEC_PATH, KEEPASS_TEMPLATE_PATH
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
 from sources.popup_message import message_popup
@@ -78,67 +79,23 @@ class KeePass:
         raise KeePassException('Invalid master key')
 
     def create(self) -> str:
-        # message_popup(message=str(EXEC_FOLDER))
-        # message_popup(message=EXEC_PATH)
-        print(KEEPASS_CREATE_PATH)
-
         if os.path.exists(KEEPASS_CREATE_PATH):
             raise KeePassException('KeePass file already exists')
 
-        # try:
-        #     self.master_key = get_password(message='Enter KeePass master key:')
-        #     message_popup(message=f'"{self.master_key}"')
-        # except InvalidPassword:
-        #     return 'test'
-        self.master_key = 'test'
+        try:
+            self.master_key = get_password(message='Enter KeePass master key:')
+            message_popup(message=f'"{self.master_key}"')
+        except InvalidPassword:
+            return ''
 
         try:
-            # KDBX.parse_file(
-            #     KEEPASS_CREATE_PATH,
-            #     password=self.master_key,
-            #     keyfile=None,
-            #     transformed_key=None
-            # )
-            # KDBX.build_file(
-            #     self.database,
-            #     KEEPASS_CREATE_PATH,
-            #     password=self.master_key,
-            #     keyfile=None,
-            #     transformed_key=None
-            # )
-            # KDBX.build_stream(
-            #     self.database,
-            #     KEEPASS_CREATE_PATH,
-            #     password=self.master_key,
-            #     keyfile=None,
-            #     transformed_key=None
-            # )
-            # message_popup(message=KEEPASS_CREATE_PATH)
-            # self.database = PyKeePass(KEEPASS_CREATE_PATH, password=self.master_key)
-            # save to temporary file to prevent database clobbering
-            # see issues 223, 101
-            # filename_tmp = Path(KEEPASS_CREATE_PATH).with_suffix('.tmp')
-            # message_popup(message=str(filename_tmp))
-            # try:
-            #     KDBX.build_file(
-            #         self.database,
-            #         filename_tmp,
-            #         password=self.master_key,
-            #     )
-            # except Exception as e:
-            #     message_popup(message=str(e))
-            #     # os.remove(filename_tmp)
-            #     raise e
-            # message_popup(message='Successfully created tmp file')
-            # shutil.move(filename_tmp, KEEPASS_CREATE_PATH)
-            # message_popup(message='Successfully moved tmp file')
-
-            self.database = create_database(Path(KEEPASS_CREATE_PATH), password=self.master_key)
+            self.database = PyKeePass(KEEPASS_TEMPLATE_PATH, BLANK_DATABASE_PASSWORD)
+            self.database.filename = KEEPASS_CREATE_PATH
+            self.database.password = self.master_key
             message_popup(message=self.database.filename)
             self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
             self.database.save()
         except Exception as e:
-            # raise e
             return str(e)
         except:
             return 'Unknown error'
