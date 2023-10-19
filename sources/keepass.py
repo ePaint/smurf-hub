@@ -80,9 +80,12 @@ class KeePass:
         except InvalidPassword:
             return 'test'
 
-        self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
-        self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
-        self.database.save()
+        try:
+            self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
+            self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
+            self.database.save()
+        except Exception as e:
+            return str(e)
 
         return KEEPASS_CREATE_PATH
 
