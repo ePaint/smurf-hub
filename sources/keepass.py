@@ -8,6 +8,7 @@ from pykeepass.group import Group
 from definitions import EXEC_FOLDER, APP_TITLE, KEEPASS_CREATE_PATH
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
+from sources.popup_message import error_popup
 from sources.settings import SETTINGS
 from uuid import UUID
 
@@ -78,6 +79,7 @@ class KeePass:
         try:
             self.master_key = get_password(message='Enter KeePass master key:')
         except InvalidPassword:
+            error_popup('Invalid master key')
             return ''
 
         self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
