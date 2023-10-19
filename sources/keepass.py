@@ -73,13 +73,13 @@ class KeePass:
         raise KeePassException('Invalid master key')
 
     def create(self) -> str:
-        if os.path.exists(KEEPASS_CREATE_PATH):
-            raise KeePassException('KeePass file already exists')
-
         message_popup(EXEC_FOLDER)
         message_popup(EXEC_PATH)
         message_popup(KEEPASS_CREATE_PATH)
-        return ''
+        return
+
+        if os.path.exists(KEEPASS_CREATE_PATH):
+            raise KeePassException('KeePass file already exists')
 
         try:
             self.master_key = get_password(message='Enter KeePass master key:')
