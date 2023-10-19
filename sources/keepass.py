@@ -93,8 +93,7 @@ class KeePass:
 
         try:
             message_popup(message=KEEPASS_CREATE_PATH)
-            self.database = PyKeePass(KEEPASS_CREATE_PATH, password=self.master_key)
-
+            # self.database = PyKeePass(KEEPASS_CREATE_PATH, password=self.master_key)
             # save to temporary file to prevent database clobbering
             # see issues 223, 101
             filename_tmp = Path(KEEPASS_CREATE_PATH).with_suffix('.tmp')
@@ -108,7 +107,7 @@ class KeePass:
                 os.remove(filename_tmp)
                 raise e
             shutil.move(filename_tmp, KEEPASS_CREATE_PATH)
-            
+
             # self.database = create_database(Path(KEEPASS_CREATE_PATH), password=self.master_key)
             message_popup(message=self.database.filename)
             self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
