@@ -1,21 +1,15 @@
 import os
-import shutil
 from enum import Enum
-from pathlib import Path
 from typing import Optional
-
-from pykeepass.kdbx_parsing import KDBX
 from pykeepass.pykeepass import BLANK_DATABASE_PASSWORD
-
 from sources.settings import SETTINGS
-from pykeepass import PyKeePass, create_database
+from pykeepass import PyKeePass
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
 from pykeepass.group import Group
-from definitions import APP_TITLE, KEEPASS_CREATE_PATH, EXEC_FOLDER, EXEC_PATH, KEEPASS_TEMPLATE_PATH
+from definitions import APP_TITLE, KEEPASS_CREATE_PATH, KEEPASS_TEMPLATE_PATH
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
-from sources.popup_message import message_popup
 from uuid import UUID
 
 
@@ -69,8 +63,11 @@ class KeePass:
                 if not self.master_key:
                     self.master_key = get_password(message='Enter KeePass master key:', error_message=error_message)
                 self.database = PyKeePass(SETTINGS.keepass_path, password=self.master_key)
-                self.group = self.database.find_groups_by_name(APP_TITLE, first=True)
-                return
+                for group in self.database.root_group.subgroups:
+                    if group.name == APP_TITLE:
+                        self.group = group
+                        return
+                raise KeePassException('Invalid KeePass file')
             except CredentialsError:
                 self.master_key = None
                 error_message = f'Invalid master key. {max_tries - tries - 1} attempt{"" if max_tries - tries - 1 == 1 else "s"} left.'
@@ -84,23 +81,17 @@ class KeePass:
 
         try:
             self.master_key = get_password(message='Enter KeePass master key:')
-            message_popup(message=f'"{self.master_key}"')
         except InvalidPassword:
             return ''
 
         try:
-            message_popup(message='Creating KeePass file')
-            message_popup(message=f'"{KEEPASS_CREATE_PATH}"')
             self.database = PyKeePass(KEEPASS_TEMPLATE_PATH, BLANK_DATABASE_PASSWORD)
             self.database.filename = KEEPASS_CREATE_PATH
             self.database.password = self.master_key
-            message_popup(message=self.database.filename)
             self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
             self.database.save()
-        except Exception as e:
-            return str(e)
-        except:
-            return 'Unknown error'
+        except Exception:
+            raise KeePassException('Failed to create KeePass file')
 
         return KEEPASS_CREATE_PATH
 
@@ -109,7 +100,7 @@ class KeePass:
         try:
             self.database.add_entry(self.group, account.title, account.username, account.password, icon='1')
             self.database.save()
-        except Exception as e:
+        except Exception:
             raise KeePassException(f'Account  already exists:\nTitle: {account.title}\nUsername: {account.username}')
 
     def get_entry(self, account_id: str) -> Entry:
