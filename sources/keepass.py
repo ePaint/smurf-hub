@@ -89,6 +89,8 @@ class KeePass:
             return ''
 
         try:
+            message_popup(message='Creating KeePass file')
+            message_popup(message=f'"{KEEPASS_CREATE_PATH}"')
             self.database = PyKeePass(KEEPASS_TEMPLATE_PATH, BLANK_DATABASE_PASSWORD)
             self.database.filename = KEEPASS_CREATE_PATH
             self.database.password = self.master_key
