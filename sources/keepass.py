@@ -76,12 +76,15 @@ class KeePass:
         if os.path.exists(KEEPASS_CREATE_PATH):
             raise KeePassException('KeePass file already exists')
 
+        message_popup(KEEPASS_CREATE_PATH)
+        return ''
+
         try:
             self.master_key = get_password(message='Enter KeePass master key:')
         except InvalidPassword:
             return 'test'
 
-        message_popup(KEEPASS_CREATE_PATH)
+
         try:
             self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
             self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
