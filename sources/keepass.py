@@ -82,6 +82,7 @@ class KeePass:
 
         try:
             self.master_key = get_password(message='Enter KeePass master key:')
+            message_popup(message=f'"{self.master_key}"')
         except InvalidPassword:
             return 'test'
 
