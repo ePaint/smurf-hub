@@ -73,7 +73,7 @@ class KeePass:
         raise KeePassException('Invalid master key')
 
     def create(self) -> str:
-        message_popup(message=EXEC_FOLDER)
+        message_popup(message=str(EXEC_FOLDER))
         message_popup(message=EXEC_PATH)
         message_popup(message=KEEPASS_CREATE_PATH)
         return 'test'
