@@ -5,7 +5,7 @@ from pykeepass import PyKeePass, create_database
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
 from pykeepass.group import Group
-from definitions import EXEC_FOLDER, APP_TITLE
+from definitions import EXEC_FOLDER, APP_TITLE, KEEPASS_CREATE_PATH
 from sources.accounts import Account
 from sources.password_popup import get_password, InvalidPassword
 from sources.settings import SETTINGS
@@ -72,8 +72,7 @@ class KeePass:
         raise KeePassException('Invalid master key')
 
     def create(self) -> str:
-        keepass_path = EXEC_FOLDER.joinpath(f'{APP_TITLE}.kdbx')
-        if keepass_path.exists():
+        if os.path.exists(KEEPASS_CREATE_PATH):
             raise KeePassException('KeePass file already exists')
 
         try:
@@ -81,11 +80,11 @@ class KeePass:
         except InvalidPassword:
             return ''
 
-        self.database = create_database(str(keepass_path), password=self.master_key)
+        self.database = create_database(KEEPASS_CREATE_PATH, password=self.master_key)
         self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
         self.database.save()
 
-        return str(keepass_path)
+        return KEEPASS_CREATE_PATH
 
     @database_required
     def add_account(self, account: Account):
