@@ -4,52 +4,28 @@ from pydantic import BaseModel, Field, validator, root_validator
 from definitions import ACCOUNTS_PATH
 
 
-class KeepassStatus(Enum):
-    NOT_SET = 0
-    DISABLED = 1
-    ENABLED = 2
-
-
 class Account(BaseModel):
-    name: str = None
-    keepass: KeepassStatus = Field(default=KeepassStatus.NOT_SET, repr=False, exclude=True)
-    keepass_reference: str = None
+    account_id: str = None
+    title: str = None
     username: str = None
-    password: str = None
+    password: str = Field(default=None, exclude=True)
 
-    @root_validator(pre=True)
-    def root_validator(cls, values):
-        keepass_enabled = values.get('keepass_enabled')
-        if keepass_enabled is True:
-            values['keepass'] = KeepassStatus.ENABLED
-        elif keepass_enabled is False:
-            values['keepass'] = KeepassStatus.DISABLED
-        else:
-            values['keepass'] = KeepassStatus.NOT_SET
-        return values
-
-    @validator('name')
-    def name_validator(cls, v):
+    @validator('title')
+    def title_validator(cls, v):
         if not v:
-            raise ValueError('Name must be set')
-        return v
-
-    @validator('keepass_reference')
-    def keepass_reference_validator(cls, v, values):
-        if values['keepass'] == KeepassStatus.ENABLED and not v:
-            raise ValueError('KeePass Reference must be set if you are using keepass')
+            raise ValueError('Title must be set')
         return v
 
     @validator('username')
-    def username_validator(cls, v, values):
-        if values['keepass'] == KeepassStatus.DISABLED and not v:
-            raise ValueError('Username must be set if you are not using keepass')
+    def username_validator(cls, v):
+        if not v:
+            raise ValueError('Username must be set')
         return v
 
     @validator('password')
-    def password_validator(cls, v, values):
-        if values['keepass'] == KeepassStatus.DISABLED and not v:
-            raise ValueError('Password must be set if you are not using keepass')
+    def password_validator(cls, v):
+        if not v:
+            raise ValueError('Password must be set')
         return v
 
 
@@ -57,10 +33,10 @@ class Accounts(BaseModel):
     accounts: Dict[str, Account] = Field(default_factory=dict)
 
     def add(self, account: Account):
-        self.accounts[account.name] = account
+        self.accounts[account.title] = account
 
-    def get_account(self, name: str) -> Optional[Account]:
-        return self.accounts.get(name)
+    def get_account(self, title: str) -> Optional[Account]:
+        return self.accounts.get(title)
 
     def save(self):
         print(self.json(indent=4, exclude_none=True))
@@ -70,7 +46,7 @@ class Accounts(BaseModel):
 
     def delete(self, index: int):
         account = list(self.accounts.values())[index]
-        del self.accounts[account.name]
+        del self.accounts[account.title]
 
     def clear(self):
         self.accounts = {}

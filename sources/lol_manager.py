@@ -6,8 +6,9 @@ from pykeepass import PyKeePass
 from pykeepass.exceptions import CredentialsError
 from pynput.keyboard import Key, Controller
 from sources.accounts import ACCOUNTS, Account
+from sources.keepass import KeePass, KEEPASS
 from sources.popup_message import error_popup
-from sources.password_popup import get_password
+from sources.password_popup import get_password, InvalidPassword
 from sources.settings import SETTINGS
 import ctypes
 ctypes.windll.ole32.CoInitialize()
@@ -36,44 +37,12 @@ class LoginBehavior(Enum):
     USE_CREDENTIALS = 'use_credentials'
 
 
-def get_account(name: str) -> Account:
-    account: Account = ACCOUNTS.get_account(name)
+def get_account(account_id: str) -> Account:
+    KEEPASS.load()
+    account: Account = KEEPASS.get_account(account_id=account_id)
     if not account:
-        raise InvalidAccount(f'Account "{name}" not found')
+        raise InvalidAccount(f'Account "{account_id}" not found')
     return account
-
-
-def get_credentials(account: Account, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS) -> (str, str):
-    if behavior == LoginBehavior.USE_KEEPASS:
-        use_keepass = True
-    elif behavior == LoginBehavior.USE_CREDENTIALS:
-        use_keepass = False
-    else:
-        use_keepass = SETTINGS.keepass_enabled
-
-    print(f'get_credentials: use_keepass = {use_keepass}')
-    if use_keepass:
-        if not SETTINGS.keepass_path:
-            raise InvalidCredentials('KeePass path not set')
-
-        if not account.keepass_reference:
-            raise InvalidCredentials('KeePass reference not set')
-
-        master_key = get_password()
-        try:
-            keepass = PyKeePass(SETTINGS.keepass_path, password=master_key)
-        except CredentialsError:
-            raise InvalidCredentials('Invalid master key')
-
-        entry = keepass.find_entries(title=account.keepass_reference, first=True)
-        username, password = entry.username, entry.password
-    else:
-        username, password = account.username, account.password
-
-    if not username or not password:
-        raise InvalidCredentials('Username or password not set')
-
-    return username, password
 
 
 def stop_lol_client():
@@ -105,18 +74,13 @@ def restart_lol_client():
     return start_lol_client()
 
 
-def login_lol_client(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS):
-    print(f'Logging in {name}, behavior = {behavior}')
+def login_lol_client(account_id: str):
+    print(f'Logging in {account_id}')
 
     try:
-        account = get_account(name)
+        account = get_account(account_id=account_id)
+        print(f'Account: {account.json(indent=4)}')
     except InvalidAccount as e:
-        print(e)
-        error_popup(message=str(e))
-        return
-    try:
-        username, password = get_credentials(account, behavior)
-    except (InvalidAccount, InvalidCredentials) as e:
         print(e)
         error_popup(message=str(e))
         return
@@ -144,9 +108,9 @@ def login_lol_client(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETT
 
     window.set_focus()
     keyboard = Controller()
-    keyboard.type(username)
+    keyboard.type(account.username)
     keyboard.tap(Key.tab)
-    keyboard.type(password)
+    keyboard.type(account.password)
     keyboard.tap(Key.tab)
     keyboard.tap(Key.tab)
     keyboard.tap(Key.tab)

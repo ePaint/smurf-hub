@@ -1,4 +1,8 @@
 import os.path
+
+from PyQt6.QtCore import Qt
+from pykeepass import PyKeePass, create_database
+from pykeepass.exceptions import CredentialsError
 from win32com.client import Dispatch
 from functools import partial
 from pathlib import Path
@@ -7,7 +11,10 @@ from PyQt6 import uic
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog, QCheckBox
 from pydantic import ValidationError
-from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL
+from definitions import PROJECT_FOLDER, PYTHON_VENV_PATH, ICON_PATH, LOL_MANAGER_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, VBS_FOLDER, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, EXEC_FOLDER
+from sources.keepass import KeePass, KeePassException, KeePassField, KEEPASS
+from sources.password_field import PasswordWidget
+from sources.password_popup import get_password, InvalidPassword
 from sources.popup_message import error_popup, message_popup
 from sources.settings import SETTINGS
 from sources.accounts import ACCOUNTS, Account, Accounts
@@ -17,16 +24,16 @@ from sources.lol_manager import login_lol_client, LoginBehavior, start_lol_clien
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
+
+        # Init widgets
         self.settings_lol_path_input: Optional[QLineEdit] = None
         self.settings_lol_path_file_selector_button: Optional[QPushButton] = None
-        self.settings_keepass_checkbox: Optional[QCheckBox] = None
+        self.settings_keepass_create_button: Optional[QPushButton] = None
         self.settings_keepass_path_label: Optional[QLabel] = None
         self.settings_keepass_path_input: Optional[QLineEdit] = None
         self.settings_keepass_path_file_selector_button: Optional[QPushButton] = None
-        self.new_account_name_label: Optional[QLabel] = None
-        self.new_account_name_input: Optional[QLineEdit] = None
-        self.new_account_keepass_reference_label: Optional[QLabel] = None
-        self.new_account_keepass_reference_input: Optional[QLineEdit] = None
+        self.new_account_title_label: Optional[QLabel] = None
+        self.new_account_title_input: Optional[QLineEdit] = None
         self.new_account_username_label: Optional[QLabel] = None
         self.new_account_username_input: Optional[QLineEdit] = None
         self.new_account_password_label: Optional[QLabel] = None
@@ -39,6 +46,10 @@ class MainWindow(QWidget):
         self.paypal_button: Optional[QPushButton] = None
 
     def start_app(self):
+        # Load keepass database
+        KEEPASS.load()
+
+        # Load UI
         uic.loadUi(MAIN_UI_PATH, self)
         self.setWindowTitle(APP_TITLE)
         self.setWindowIcon(QIcon(ICON_PATH))
@@ -47,17 +58,14 @@ class MainWindow(QWidget):
         self.settings_lol_path_input.setText(SETTINGS.lol_path)
         self.settings_lol_path_file_selector_button.clicked.connect(self.select_lol_folder)
 
-        self.settings_keepass_checkbox.setChecked(SETTINGS.keepass_enabled)
+        self.settings_keepass_create_button.clicked.connect(self.create_keepass_file)
         self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
         self.settings_keepass_path_file_selector_button.clicked.connect(self.select_keepass_file)
 
         self.settings_lol_path_input.returnPressed.connect(self.save_settings)
-        self.settings_keepass_checkbox.clicked.connect(self.toggle_keepass)
-        self.settings_keepass_checkbox.clicked.connect(self.save_settings)
         self.settings_keepass_path_input.returnPressed.connect(self.save_settings)
 
         self.new_account_add_button.clicked.connect(self.add_account)
-        self.toggle_keepass()
 
         self.init_accounts_table()
         self.accounts_table.cellChanged.connect(self.save_accounts_table_changes)
@@ -72,11 +80,34 @@ class MainWindow(QWidget):
 
         self.show()
 
+    def init_accounts_table(self):
+        self.accounts_table.setColumnCount(7)
+        self.accounts_table.setHorizontalHeaderLabels(['ID', 'Title', 'Username', 'Password', 'Run', 'Link', 'Delete'])
+        self.accounts_table.setColumnWidth(0, 0)
+        self.accounts_table.setColumnWidth(1, 80)
+        self.accounts_table.setColumnWidth(2, 85)
+        self.accounts_table.setColumnWidth(3, 85)
+        self.accounts_table.setColumnWidth(4, 50)
+        self.accounts_table.setColumnWidth(5, 50)
+        self.accounts_table.setColumnWidth(6, 52)
+        self.accounts_table.hideColumn(0)
+        self.update_accounts_table()
+
     def select_lol_folder(self):
         selected_path = QFileDialog.getExistingDirectory(self, 'Select League of Legends folder', SETTINGS.lol_path)
         SETTINGS.set_lol_path(str(Path(selected_path)))
         self.settings_lol_path_input.setText(SETTINGS.lol_path)
         SETTINGS.save()
+
+    def create_keepass_file(self):
+        try:
+            SETTINGS.keepass_path = KEEPASS.create()
+        except KeePassException as e:
+            error_popup(message=str(e))
+            return
+        SETTINGS.keepass_enabled = True
+        SETTINGS.save()
+        self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
 
     def select_keepass_file(self):
         selected_path = QFileDialog.getOpenFileName(self, 'Select KeePass file', SETTINGS.keepass_path, 'KeePass files (*.kdbx)')[0]
@@ -87,118 +118,77 @@ class MainWindow(QWidget):
     def add_account(self):
         try:
             account = Account(
-                name=self.new_account_name_input.text() or None,
-                keepass_enabled=SETTINGS.keepass_enabled,
-                keepass_reference=self.new_account_keepass_reference_input.text() or None,
-                username=self.new_account_username_input.text() or None,
-                password=self.new_account_password_input.text() or None
+                title=self.new_account_title_input.text(),
+                username=self.new_account_username_input.text(),
+                password=self.new_account_password_input.text()
             )
         except ValidationError as e:
-            message = e.errors()[0]['msg']
-            print(message)
-            error_popup(message=message)
+            error_message = e.errors()[0]['msg']
+            error_popup(message=error_message)
             return
-        self.new_account_name_input.setText('')
-        self.new_account_keepass_reference_input.setText('')
-        self.new_account_username_input.setText('')
-        self.new_account_password_input.setText('')
-        ACCOUNTS.add(account)
-        ACCOUNTS.save()
-        self.update_accounts_table()
-        self.new_account_name_input.setFocus()
 
-    def init_accounts_table(self):
-        self.accounts_table.setColumnCount(7)
-        self.accounts_table.setHorizontalHeaderLabels(['Name', 'KeePass Reference', 'Username', 'Password', 'Run', 'Link', 'Delete'])
-        self.accounts_table.setColumnWidth(0, 80)
-        self.accounts_table.setColumnWidth(1, 170)
-        self.accounts_table.setColumnWidth(2, 85)
-        self.accounts_table.setColumnWidth(3, 85)
-        self.accounts_table.setColumnWidth(4, 50)
-        self.accounts_table.setColumnWidth(5, 50)
-        self.accounts_table.setColumnWidth(6, 52)
+        try:
+            KEEPASS.add_account(account)
+        except KeePassException as e:
+            error_popup(message=str(e))
+            return
         self.update_accounts_table()
 
     def update_accounts_table(self):
         try:
             self.accounts_table.cellChanged.disconnect()
-        except TypeError as e:
+        except TypeError:
             pass
-        self.accounts_table.setRowCount(len(ACCOUNTS.accounts))
-        for i, account in enumerate(ACCOUNTS.accounts.values()):
-            self.accounts_table.setItem(i, 0, QTableWidgetItem(account.name))
-            self.accounts_table.setItem(i, 1, QTableWidgetItem(account.keepass_reference))
+
+        accounts = KEEPASS.list_accounts()
+        self.accounts_table.setRowCount(len(accounts))
+        for i, account in enumerate(accounts):
+            password_widget, execute_button, link_button, delete_button = self._get_table_buttons(account)
+
+            self.accounts_table.setItem(i, 0, QTableWidgetItem(account.account_id))
+            self.accounts_table.setItem(i, 1, QTableWidgetItem(account.title))
             self.accounts_table.setItem(i, 2, QTableWidgetItem(account.username))
-            self.accounts_table.setItem(i, 3, QTableWidgetItem(account.password))
-
-            execute_button = QPushButton('🚀')
-            execute_button.setObjectName(f'execute_button_{i}')
-            execute_button.setToolTip(f'Run League of Legends as {account.name} using {"KeePass" if SETTINGS.keepass_enabled else "username and password"}')
-            execute_button.clicked.connect(partial(login_lol_client, account.name, LoginBehavior.USE_SETTINGS))
-
-            link_button = QPushButton('📑')
-            link_button.setObjectName(f'link_button_{i}')
-            link_button.setToolTip(f'Create shortcut for {account.name} using {"KeePass" if SETTINGS.keepass_enabled else "username and password"}')
-            link_button.clicked.connect(partial(self.create_shortcut, account.name))
-
-            delete_button = QPushButton('❌️')
-            delete_button.setObjectName(f'delete_button_{i}')
-            delete_button.setToolTip(f'Delete {account.name}')
-            delete_button.clicked.connect(partial(self.process_delete, i))
-
+            self.accounts_table.setItem(i, 3, password_widget)
             self.accounts_table.setCellWidget(i, 4, execute_button)
             self.accounts_table.setCellWidget(i, 5, link_button)
             self.accounts_table.setCellWidget(i, 6, delete_button)
-        self.accounts_table.setColumnHidden(1, not SETTINGS.keepass_enabled)
-        self.accounts_table.setColumnHidden(2, SETTINGS.keepass_enabled)
-        self.accounts_table.setColumnHidden(3, SETTINGS.keepass_enabled)
+
         self.accounts_table.cellChanged.connect(self.save_accounts_table_changes)
 
-    def save_accounts_table_changes(self):
-        print('RUNNING SAVE ACCOUNTS TABLE CHANGES')
-        NEW_ACCOUNTS = Accounts()
-        for i in range(self.accounts_table.rowCount()):
-            is_deleted = self.accounts_table.cellWidget(i, 5).isChecked()
-            if is_deleted:
-                print('DELETED', i)
-                continue
-            print('ROW COUNT', self.accounts_table.rowCount(), 'INDEX', i)
-            name = self.accounts_table.item(i, 0).text() or None
-            keepass_reference = self.accounts_table.item(i, 1).text() or None
-            username = self.accounts_table.item(i, 2).text() or None
-            password = self.accounts_table.item(i, 3).text() or None
-            print('username', username)
-            print('password', password)
-            account = Account(
-                name=name,
-                keepass_reference=keepass_reference,
-                username=username,
-                password=password
-            )
-            print('account', account)
-            NEW_ACCOUNTS.add(account)
-        ACCOUNTS.accounts = NEW_ACCOUNTS.accounts
-        ACCOUNTS.save()
+    def save_accounts_table_changes(self, row, col):
+        self.accounts_table.cellChanged.disconnect()
 
-    def toggle_keepass(self):
-        SETTINGS.keepass_enabled = self.settings_keepass_checkbox.isChecked()
-        self.setWindowTitle(APP_TITLE + ' (KeePass)' if SETTINGS.keepass_enabled else APP_TITLE)
+        print('RUNNING SAVE ACCOUNTS TABLE CHANGES...')
+        print(f'ROW: {row}, COL: {col}')
 
-        self.settings_keepass_path_label.setDisabled(not SETTINGS.keepass_enabled)
-        self.settings_keepass_path_input.setDisabled(not SETTINGS.keepass_enabled)
+        new_value = self.accounts_table.item(row, col).text() or None
 
-        self.settings_keepass_path_file_selector_button.setDisabled(not SETTINGS.keepass_enabled)
+        field = None
+        if col == 1:
+            field = KeePassField.TITLE
+        if col == 2:
+            field = KeePassField.USERNAME
+        if col == 3:
+            field = KeePassField.PASSWORD
+            self.accounts_table.item(row, col).setText('******')
+        if field is None:
+            return
 
-        self.new_account_keepass_reference_label.setDisabled(not SETTINGS.keepass_enabled)
-        self.new_account_keepass_reference_input.setDisabled(not SETTINGS.keepass_enabled)
+        account_id = self.accounts_table.item(row, 0).text() or None
 
-        self.new_account_username_label.setDisabled(SETTINGS.keepass_enabled)
-        self.new_account_username_input.setDisabled(SETTINGS.keepass_enabled)
+        if not new_value:
+            account = KEEPASS.get_account(account_id=account_id)
+            old_value = account.__getattribute__(field.value)
+            self.accounts_table.item(row, col).setText(old_value)
+            error_popup(message=f'Invalid {field.value} value')
+            return
 
-        self.new_account_password_label.setDisabled(SETTINGS.keepass_enabled)
-        self.new_account_password_input.setDisabled(SETTINGS.keepass_enabled)
+        KEEPASS.update_account_field(account_id=account_id, field=field, value=new_value)
 
-        self.update_accounts_table()
+        if field.PASSWORD:
+            self.accounts_table.item(row, col).setData(Qt.ItemDataRole.BackgroundRole, new_value)
+
+        self.accounts_table.cellChanged.connect(self.save_accounts_table_changes)
 
     def save_settings(self):
         lol_path = self.settings_lol_path_input.text()
@@ -217,28 +207,22 @@ class MainWindow(QWidget):
         SETTINGS.keepass_path = keepass_path
         SETTINGS.save()
 
-    def process_delete(self, index: int):
+    def process_delete(self, account_id: str):
         self.unsetCursor()
-        ACCOUNTS.delete(index)
-        ACCOUNTS.save()
+        KEEPASS.delete_account(account_id=account_id)
         self.update_accounts_table()
 
     @staticmethod
-    def create_shortcut(name: str):
-        account = ACCOUNTS.get_account(name)
-        if not account:
-            return
-
+    def create_shortcut(account_id: str, title: str):
         if not os.path.exists(VBS_FOLDER):
             os.makedirs(str(VBS_FOLDER))
 
-        vbs_file_path = str(VBS_FOLDER.joinpath(f'{name}-login{"-keepass" if SETTINGS.keepass_enabled else ""}.vbs'))
-        lnk_file_path = str(DESKTOP_PATH.joinpath(f'Start LoL as {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""}.lnk'))
-        behavior = 'use_keepass' if SETTINGS.keepass_enabled else 'use_credentials'
+        vbs_file_path = str(VBS_FOLDER.joinpath(f'{title}-login.vbs'))
+        lnk_file_path = str(DESKTOP_PATH.joinpath(f'Start LoL as {title}.lnk'))
         with open(vbs_file_path, 'w+') as f:
             f.writelines([
                 'Set objShell = CreateObject("WScript.Shell")\n',
-                f'customCommand = """{EXEC_PATH}"" --name ""{name}"" --behavior ""{behavior}"""\n',
+                f'customCommand = """{EXEC_PATH}"" --account-id ""{account_id}"""\n',
                 'objShell.Run customCommand, 0, True'
             ])
         shell = Dispatch('WScript.Shell')
@@ -247,7 +231,7 @@ class MainWindow(QWidget):
         shortcut_file.IconLocation = ICON_PATH
         shortcut_file.WindowStyle = 7
         shortcut_file.save()
-        message_popup(message=f'Shortcut created for {name}{" (KeePass)" if SETTINGS.keepass_enabled else ""} in Desktop')
+        message_popup(message=f'Shortcut created for {title} in Desktop')
 
     @staticmethod
     def start_lol_client():
@@ -272,3 +256,29 @@ class MainWindow(QWidget):
         except InvalidSettings as e:
             print(e)
             error_popup(message=str(e))
+
+    def _get_table_buttons(self, account: Account):
+        account_id = account.account_id
+        title = account.title
+        password = account.password
+
+        password_widget: QTableWidgetItem = QTableWidgetItem()
+        password_widget.setData(Qt.ItemDataRole.BackgroundRole, password)
+        password_widget.setText("******")
+
+        execute_button = QPushButton('🚀')
+        execute_button.setObjectName(f'execute_button_{account_id}')
+        execute_button.setToolTip(f'Run League of Legends as {title}')
+        execute_button.clicked.connect(partial(login_lol_client, account_id))
+
+        link_button = QPushButton('📑')
+        link_button.setObjectName(f'link_button_{account_id}')
+        link_button.setToolTip(f'Create shortcut for {title}')
+        link_button.clicked.connect(partial(self.create_shortcut, account_id, title))
+
+        delete_button = QPushButton('❌️')
+        delete_button.setObjectName(f'delete_button_{account_id}')
+        delete_button.setToolTip(f'Delete {title}')
+        delete_button.clicked.connect(partial(self.process_delete, account_id))
+
+        return password_widget, execute_button, link_button, delete_button

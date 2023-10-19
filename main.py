@@ -12,12 +12,6 @@ def start_app():
     APP_MANAGER.start(AppSource.MAIN_WINDOW)
 
 
-def login(name: str, behavior: LoginBehavior = LoginBehavior.USE_SETTINGS):
-    # APP_MANAGER.start(AppSource.PASSWORD_POPUP)
-    login_lol_client(name=name, behavior=behavior)
-    # APP_MANAGER.stop()
-
-
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
 
@@ -26,14 +20,11 @@ def main():
     sys.excepthook = except_hook
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--name', required=False, help='The name of the account to login')
-    parser.add_argument('--behavior', required=False, help='Valid values = [use_keepass, use_settings, never_use_keepass]')
+    parser.add_argument('--account-id', required=False, help='The account_id of the account to login')
     args = parser.parse_args()
 
-    if args.name:
-        name = str(args.name)
-        behavior = LoginBehavior(args.behavior) if args.behavior else LoginBehavior.USE_SETTINGS
-        login(name=name, behavior=behavior)
+    if args.account_id:
+        login_lol_client(account_id=str(args.account_id))
     else:
         start_app()
 
