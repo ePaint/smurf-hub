@@ -2,13 +2,13 @@ import os
 from enum import Enum
 from typing import Optional
 from pykeepass.pykeepass import BLANK_DATABASE_PASSWORD
-from sources.popup import popup_get_password, popup_info, popup_error
+from sources.popup import popup_get_password
 from sources.settings import SETTINGS
 from pykeepass import PyKeePass
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
 from pykeepass.group import Group
-from definitions import APP_TITLE, KEEPASS_CREATE_PATH, KEEPASS_TEMPLATE_PATH, APP_MANAGER
+from definitions import APP_TITLE, KEEPASS_CREATE_PATH, KEEPASS_TEMPLATE_PATH
 from sources.accounts import Account
 from uuid import UUID
 
@@ -43,14 +43,10 @@ class KeePass:
         if self.database is not None:
             return
 
-        if not SETTINGS.keepass_enabled:
-            return
-
         if not SETTINGS.keepass_path:
             return
 
         if not os.path.exists(SETTINGS.keepass_path):
-            SETTINGS.keepass_enabled = False
             SETTINGS.keepass_path = ''
             SETTINGS.save()
             return
@@ -69,7 +65,9 @@ class KeePass:
                     if group.name == APP_TITLE:
                         self.group = group
                         return
-                raise KeePassException('Invalid KeePass file')
+                self.group = self.database.add_group(self.database.root_group, APP_TITLE, icon='1')
+                self.database.save()
+                return
             except CredentialsError:
                 self.master_key = None
                 error_message = f'Invalid master key. {max_tries - tries - 1} attempt{"" if max_tries - tries - 1 == 1 else "s"} left.'
@@ -77,9 +75,27 @@ class KeePass:
 
         raise KeePassException('Invalid master key')
 
+    def unload(self, keep_master_key: bool = False):
+        if not keep_master_key:
+            self.master_key = None
+        self.database = None
+        self.group = None
+
+    def reload(self, keep_master_key: bool = False):
+        previous_master_key = self.master_key
+        previous_database = self.database
+        previous_group = self.group
+        self.unload(keep_master_key=keep_master_key)
+        try:
+            self.load()
+        except KeePassException as e:
+            self.master_key = previous_master_key
+            self.database = previous_database
+            self.group = previous_group
+            raise e
+
     def create(self) -> str:
         if os.path.exists(KEEPASS_CREATE_PATH):
-            popup_error('KeePass file already exists')
             return KEEPASS_CREATE_PATH
 
         self.master_key, submitted = popup_get_password()

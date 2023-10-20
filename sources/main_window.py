@@ -54,8 +54,8 @@ class MainWindow(QWidget):
         self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
         self.settings_keepass_path_file_selector_button.clicked.connect(self.select_keepass_file)
 
-        self.settings_lol_path_input.returnPressed.connect(self.save_settings)
-        self.settings_keepass_path_input.returnPressed.connect(self.save_settings)
+        self.settings_lol_path_input.returnPressed.connect(self.update_lol_path)
+        self.settings_keepass_path_input.returnPressed.connect(self.update_keepass_path)
 
         self.new_account_add_button.clicked.connect(self.add_account)
 
@@ -87,25 +87,19 @@ class MainWindow(QWidget):
 
     def select_lol_folder(self):
         selected_path = QFileDialog.getExistingDirectory(self, 'Select League of Legends folder', SETTINGS.lol_path)
-        SETTINGS.set_lol_path(str(Path(selected_path)))
-        self.settings_lol_path_input.setText(SETTINGS.lol_path)
-        SETTINGS.save()
+        self.settings_lol_path_input.setText(str(Path(selected_path)))
+        self.update_lol_path()
 
     def create_keepass_file(self):
         try:
-            SETTINGS.keepass_path = KEEPASS.create()
+            self.update_keepass_path(keepass_path=KEEPASS.create())
         except KeePassException as e:
             popup_error(message=str(e))
             return
-        SETTINGS.keepass_enabled = True
-        SETTINGS.save()
-        self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
 
     def select_keepass_file(self):
         selected_path = QFileDialog.getOpenFileName(self, 'Select KeePass file', SETTINGS.keepass_path, 'KeePass files (*.kdbx)')[0]
-        SETTINGS.keepass_path = str(Path(selected_path))
-        self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
-        SETTINGS.save()
+        self.update_keepass_path(keepass_path=selected_path)
 
     def add_account(self):
         try:
@@ -182,22 +176,43 @@ class MainWindow(QWidget):
 
         self.accounts_table.cellChanged.connect(self.save_accounts_table_changes)
 
-    def save_settings(self):
+    def update_lol_path(self):
         lol_path = self.settings_lol_path_input.text()
         if lol_path and not os.path.exists(lol_path):
             popup_error(message='Invalid League of Legends path')
             self.settings_lol_path_input.setText(SETTINGS.lol_path)
             return
 
-        keepass_path = self.settings_keepass_path_input.text()
+        SETTINGS.set_lol_path(lol_path)
+        SETTINGS.save()
+
+    def update_keepass_path(self, keepass_path: str = None):
+        if keepass_path is None:
+            keepass_path = self.settings_keepass_path_input.text()
+            if not keepass_path:
+                return
+
+        if keepass_path == SETTINGS.keepass_path:
+            return
+
+        self.settings_keepass_path_input.setText(keepass_path)
         if keepass_path and not os.path.exists(keepass_path):
             popup_error(message='Invalid KeePass path')
             self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
             return
 
-        SETTINGS.set_lol_path(lol_path)
+        previous_keepass_path = SETTINGS.keepass_path
         SETTINGS.keepass_path = keepass_path
+        try:
+            KEEPASS.reload()
+        except KeePassException as e:
+            print('ERROR', str(e))
+            popup_error(message=str(e))
+            SETTINGS.keepass_path = previous_keepass_path
+            self.settings_keepass_path_input.setText(previous_keepass_path)
+
         SETTINGS.save()
+        self.update_accounts_table()
 
     def process_delete(self, account_id: str):
         self.unsetCursor()

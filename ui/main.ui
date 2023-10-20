@@ -407,6 +407,9 @@ QCheckBox::indicator:checked {
      <pointsize>-1</pointsize>
     </font>
    </property>
+   <property name="toolTip">
+    <string>Select League of Legends installation folder</string>
+   </property>
    <property name="text">
     <string>...</string>
    </property>
@@ -427,6 +430,9 @@ QCheckBox::indicator:checked {
     <font>
      <pointsize>-1</pointsize>
     </font>
+   </property>
+   <property name="toolTip">
+    <string>Select KBDX file</string>
    </property>
    <property name="text">
     <string>...</string>
@@ -502,6 +508,9 @@ QCheckBox::indicator:checked {
     <font>
      <pointsize>-1</pointsize>
     </font>
+   </property>
+   <property name="toolTip">
+    <string>Create new KBDX file</string>
    </property>
    <property name="text">
     <string>➕</string>
