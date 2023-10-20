@@ -85,6 +85,10 @@ QPushButton#paypal_button:hover {
     background: #ffffff;
 }
 
+QPushButton#settings_keepass_cache_button {
+    font-size: 12px;
+}
+
 QPushButton::disabled {
     background: #213a38;
     color: #19302e;
@@ -93,6 +97,10 @@ QPushButton::disabled {
 }
 
 QPushButton::enabled:hover {
+    background-color: #0c1718;
+}
+
+QPushButton::enabled:checked {
     background-color: #0c1718;
 }
 
@@ -194,7 +202,7 @@ QCheckBox::indicator:checked {
     <rect>
      <x>50</x>
      <y>110</y>
-     <width>361</width>
+     <width>241</width>
      <height>21</height>
     </rect>
    </property>
@@ -207,7 +215,7 @@ QCheckBox::indicator:checked {
     <rect>
      <x>50</x>
      <y>90</y>
-     <width>211</width>
+     <width>111</width>
      <height>16</height>
     </rect>
    </property>
@@ -420,7 +428,7 @@ QCheckBox::indicator:checked {
   <widget class="QPushButton" name="settings_keepass_path_file_selector_button">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>300</x>
      <y>110</y>
      <width>21</width>
      <height>21</height>
@@ -517,6 +525,38 @@ QCheckBox::indicator:checked {
    </property>
    <property name="checkable">
     <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="settings_keepass_cache_label">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>90</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Cache master key</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="settings_keepass_cache_button">
+   <property name="geometry">
+    <rect>
+     <x>330</x>
+     <y>110</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

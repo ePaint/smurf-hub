@@ -11,6 +11,11 @@ from pykeepass.group import Group
 from definitions import APP_TITLE, KEEPASS_CREATE_PATH, KEEPASS_TEMPLATE_PATH
 from sources.accounts import Account
 from uuid import UUID
+from cryptography.fernet import Fernet
+
+
+MASTER_KEY_ENV_VAR = 'SMURF_HUB_KEEPASS_MASTER_KEY'
+SECRET_KEY_ENV_VAR = 'SMURF_HUB_KEEPASS_SECRET_KEY'
 
 
 class KeePassException(Exception):
@@ -35,9 +40,21 @@ def database_required(func):
 
 class KeePass:
     def __init__(self):
+        self.secret_key: Optional[str] = os.environ.get(SECRET_KEY_ENV_VAR)
+        print(f'KeePass secret key: {self.secret_key}')
+        if not self.secret_key:
+            self.secret_key = Fernet.generate_key().decode('utf-8')
+            os.environ[SECRET_KEY_ENV_VAR] = self.secret_key
+            os.system(f'setx {SECRET_KEY_ENV_VAR} {self.secret_key}')
+
         self.master_key: Optional[str] = None
         self.database: Optional[PyKeePass] = None
         self.group: Optional[Group] = None
+
+        self.load_master_key_from_env()
+
+        print(f'KeePass secret key: {self.secret_key}')
+        print(f'KeePass master key: {self.master_key}')
 
     def load(self):
         if self.database is not None:
@@ -119,6 +136,26 @@ class KeePass:
             raise KeePassException('Failed to create KeePass file')
 
         return KEEPASS_CREATE_PATH
+
+    def save_master_key_to_env(self):
+        print(f'Encrypting master key: {self.master_key}')
+        encrypted_master_key = Fernet(self.secret_key.encode('utf-8')).encrypt(self.master_key.encode('utf-8'))
+        decoded_encrypted_master_key = encrypted_master_key.decode('utf-8')
+        os.environ[MASTER_KEY_ENV_VAR] = decoded_encrypted_master_key
+        os.system(f'setx {MASTER_KEY_ENV_VAR} {decoded_encrypted_master_key}')
+
+    def load_master_key_from_env(self):
+        print(f'Decrypting master key')
+        encrypted_master_key = os.environ.get(MASTER_KEY_ENV_VAR)
+        if not encrypted_master_key:
+            return
+        self.master_key = Fernet(self.secret_key.encode('utf-8')).decrypt(encrypted_master_key.encode('utf-8')).decode('utf-8')
+
+    @staticmethod
+    def remove_master_key_from_env():
+        print(f'Removing master key')
+        if MASTER_KEY_ENV_VAR in os.environ:
+            del os.environ[MASTER_KEY_ENV_VAR]
 
     @database_required
     def add_account(self, account: Account):

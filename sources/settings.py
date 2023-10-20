@@ -10,6 +10,7 @@ class Settings(BaseModel):
     lol_client_args: str = '--launch-product=league_of_legends --launch-patchline=live'
     lol_process_names: List[str] = ['RiotClientServices.exe', 'LeagueClient.exe']
     keepass_path: str = None
+    keepass_cache: bool = False
 
     def save(self):
         print(self.json(indent=4))

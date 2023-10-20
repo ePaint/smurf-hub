@@ -9,7 +9,7 @@ from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidget, QTableWidgetItem, QFileDialog
 from pydantic import ValidationError
 from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, UTILS_FOLDER
-from sources.keepass import KeePassException, KeePassField, KEEPASS
+from sources.keepass import KeePassException, KeePassField, KEEPASS, SECRET_KEY_ENV_VAR, MASTER_KEY_ENV_VAR
 from sources.popup import popup_error, popup_info
 from sources.settings import SETTINGS
 from sources.accounts import Account
@@ -27,6 +27,7 @@ class MainWindow(QWidget):
         self.settings_keepass_path_label: Optional[QLabel] = None
         self.settings_keepass_path_input: Optional[QLineEdit] = None
         self.settings_keepass_path_file_selector_button: Optional[QPushButton] = None
+        self.settings_keepass_cache_button: Optional[QPushButton] = None
         self.new_account_title_label: Optional[QLabel] = None
         self.new_account_title_input: Optional[QLineEdit] = None
         self.new_account_username_label: Optional[QLabel] = None
@@ -53,6 +54,9 @@ class MainWindow(QWidget):
         self.settings_keepass_create_button.clicked.connect(self.create_keepass_file)
         self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
         self.settings_keepass_path_file_selector_button.clicked.connect(self.select_keepass_file)
+        self.settings_keepass_cache_button.setChecked(SETTINGS.keepass_cache)
+        self.settings_keepass_cache_button.clicked.connect(self.keepass_cache_toggle)
+        self.keepass_cache_toggle_text()
 
         self.settings_lol_path_input.returnPressed.connect(self.update_lol_path)
         self.settings_keepass_path_input.returnPressed.connect(self.update_keepass_path)
@@ -213,6 +217,23 @@ class MainWindow(QWidget):
 
         SETTINGS.save()
         self.update_accounts_table()
+
+    def keepass_cache_toggle(self):
+        SETTINGS.keepass_cache = self.settings_keepass_cache_button.isChecked()
+        if SETTINGS.keepass_cache:
+            KEEPASS.save_master_key_to_env()
+            popup_info(message='Master key cached!')
+        else:
+            KEEPASS.remove_master_key_from_env()
+            popup_info(message='Master key removed from cache!')
+        SETTINGS.save()
+        self.keepass_cache_toggle_text()
+
+    def keepass_cache_toggle_text(self):
+        if SETTINGS.keepass_cache:
+            self.settings_keepass_cache_button.setText('Cache: On')
+        else:
+            self.settings_keepass_cache_button.setText('Cache: Off')
 
     def process_delete(self, account_id: str):
         self.unsetCursor()
