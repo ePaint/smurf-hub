@@ -1,11 +1,10 @@
 import psutil
 import sys
-from enum import Enum
 from time import sleep
 from pynput.keyboard import Key, Controller
 from sources.accounts import Account
 from sources.keepass import KEEPASS
-from sources.popup_message import error_popup
+from sources.popup import popup_error
 from sources.settings import SETTINGS
 import ctypes
 ctypes.windll.ole32.CoInitialize()
@@ -72,14 +71,14 @@ def login_lol_client(account_id: str):
         print(f'Account: {account.json(indent=4)}')
     except InvalidAccount as e:
         print(e)
-        error_popup(message=str(e))
+        popup_error(message=str(e))
         return
 
     try:
         window = restart_lol_client()
     except InvalidSettings as e:
         print(e)
-        error_popup(message=str(e))
+        popup_error(message=str(e))
         return
 
     for i in range(20):
@@ -91,7 +90,7 @@ def login_lol_client(account_id: str):
     if not window.exists():
         message = 'Riot Client Main window not found'
         print(message)
-        error_popup(message=message)
+        popup_error(message=message)
         return
 
     sleep(2)

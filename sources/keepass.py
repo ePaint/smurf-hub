@@ -2,14 +2,14 @@ import os
 from enum import Enum
 from typing import Optional
 from pykeepass.pykeepass import BLANK_DATABASE_PASSWORD
+from sources.popup import popup_get_password, popup_info, popup_error
 from sources.settings import SETTINGS
 from pykeepass import PyKeePass
 from pykeepass.entry import Entry
 from pykeepass.exceptions import CredentialsError
 from pykeepass.group import Group
-from definitions import APP_TITLE, KEEPASS_CREATE_PATH, KEEPASS_TEMPLATE_PATH
+from definitions import APP_TITLE, KEEPASS_CREATE_PATH, KEEPASS_TEMPLATE_PATH, APP_MANAGER
 from sources.accounts import Account
-from sources.password_popup import get_password, InvalidPassword
 from uuid import UUID
 
 
@@ -61,7 +61,9 @@ class KeePass:
         while tries < max_tries:
             try:
                 if not self.master_key:
-                    self.master_key = get_password(message='Enter KeePass master key:', error_message=error_message)
+                    self.master_key, submitted = popup_get_password(error_message=error_message)
+                    if not submitted:
+                        exit()
                 self.database = PyKeePass(SETTINGS.keepass_path, password=self.master_key)
                 for group in self.database.root_group.subgroups:
                     if group.name == APP_TITLE:
@@ -77,14 +79,17 @@ class KeePass:
 
     def create(self) -> str:
         if os.path.exists(KEEPASS_CREATE_PATH):
-            raise KeePassException('KeePass file already exists')
+            popup_error('KeePass file already exists')
+            return KEEPASS_CREATE_PATH
+
+        self.master_key, submitted = popup_get_password()
+        if not submitted:
+            raise KeePassException('KeePass not created')
 
         try:
-            self.master_key = get_password(message='Enter KeePass master key:')
-        except InvalidPassword:
-            return ''
-
-        try:
+            print(f'Creating KeePass file: {KEEPASS_CREATE_PATH}')
+            print(f'KeePass master key: {self.master_key}')
+            print(f'KeePass template: {KEEPASS_TEMPLATE_PATH}')
             self.database = PyKeePass(KEEPASS_TEMPLATE_PATH, BLANK_DATABASE_PASSWORD)
             self.database.filename = KEEPASS_CREATE_PATH
             self.database.password = self.master_key

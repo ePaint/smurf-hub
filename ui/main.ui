@@ -281,6 +281,9 @@ QCheckBox::indicator:checked {
      <height>20</height>
     </rect>
    </property>
+   <property name="echoMode">
+    <enum>QLineEdit::PasswordEchoOnEdit</enum>
+   </property>
   </widget>
   <widget class="QLabel" name="new_account_username_label">
    <property name="enabled">

@@ -1,10 +1,11 @@
 import argparse
 import sys
 from definitions import APP_MANAGER
-from sources.keepass import KEEPASS
+from sources.keepass import KEEPASS, KeePassException
 from sources.app import AppSource
 from sources.lol_manager import login_lol_client
 from sources.main_window import MainWindow
+from sources.popup import popup_error
 
 
 def start_app():
@@ -23,7 +24,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--account-id', required=False, help='The account_id of the account to login')
     args = parser.parse_args()
-    KEEPASS.load()
+
+    try:
+        KEEPASS.load()
+    except KeePassException as e:
+        popup_error(message=str(e))
+        return
 
     if args.account_id:
         login_lol_client(account_id=str(args.account_id))

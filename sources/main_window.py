@@ -10,7 +10,7 @@ from PyQt6.QtWidgets import QWidget, QLineEdit, QPushButton, QLabel, QTableWidge
 from pydantic import ValidationError
 from definitions import ICON_PATH, MAIN_UI_PATH, APP_TITLE, DESKTOP_PATH, EXEC_PATH, PAYPAL_IMAGE_PATH, PAYPAL_DONATE_URL, UTILS_FOLDER
 from sources.keepass import KeePassException, KeePassField, KEEPASS
-from sources.popup_message import error_popup, message_popup
+from sources.popup import popup_error, popup_info
 from sources.settings import SETTINGS
 from sources.accounts import Account
 from sources.lol_manager import login_lol_client, start_lol_client, stop_lol_client, restart_lol_client, InvalidSettings
@@ -95,7 +95,7 @@ class MainWindow(QWidget):
         try:
             SETTINGS.keepass_path = KEEPASS.create()
         except KeePassException as e:
-            error_popup(message=str(e))
+            popup_error(message=str(e))
             return
         SETTINGS.keepass_enabled = True
         SETTINGS.save()
@@ -116,14 +116,18 @@ class MainWindow(QWidget):
             )
         except ValidationError as e:
             error_message = e.errors()[0]['msg']
-            error_popup(message=error_message)
+            popup_error(message=error_message)
             return
 
         try:
             KEEPASS.add_account(account)
         except KeePassException as e:
-            error_popup(message=str(e))
+            popup_error(message=str(e))
             return
+        self.new_account_title_input.setText('')
+        self.new_account_username_input.setText('')
+        self.new_account_password_input.setText('')
+        self.new_account_title_input.setFocus()
         self.update_accounts_table()
 
     def update_accounts_table(self):
@@ -168,7 +172,7 @@ class MainWindow(QWidget):
             account = KEEPASS.get_account(account_id=account_id)
             old_value = account.__getattribute__(field.value)
             self.accounts_table.item(row, col).setText(old_value)
-            error_popup(message=f'Invalid {field.value} value')
+            popup_error(message=f'Invalid {field.value} value')
             return
 
         KEEPASS.update_account_field(account_id=account_id, field=field, value=new_value)
@@ -181,13 +185,13 @@ class MainWindow(QWidget):
     def save_settings(self):
         lol_path = self.settings_lol_path_input.text()
         if lol_path and not os.path.exists(lol_path):
-            error_popup(message='Invalid League of Legends path')
+            popup_error(message='Invalid League of Legends path')
             self.settings_lol_path_input.setText(SETTINGS.lol_path)
             return
 
         keepass_path = self.settings_keepass_path_input.text()
         if keepass_path and not os.path.exists(keepass_path):
-            error_popup(message='Invalid KeePass path')
+            popup_error(message='Invalid KeePass path')
             self.settings_keepass_path_input.setText(SETTINGS.keepass_path)
             return
 
@@ -219,7 +223,7 @@ class MainWindow(QWidget):
         shortcut_file.IconLocation = ICON_PATH
         shortcut_file.WindowStyle = 7
         shortcut_file.save()
-        message_popup(message=f'Shortcut created for {title} in Desktop')
+        popup_info(message=f'Shortcut created for {title} in Desktop')
 
     @staticmethod
     def start_lol_client():
@@ -227,7 +231,7 @@ class MainWindow(QWidget):
             start_lol_client()
         except InvalidSettings as e:
             print(e)
-            error_popup(message=str(e))
+            popup_error(message=str(e))
 
     @staticmethod
     def stop_lol_client():
@@ -235,7 +239,7 @@ class MainWindow(QWidget):
             stop_lol_client()
         except InvalidSettings as e:
             print(e)
-            error_popup(message=str(e))
+            popup_error(message=str(e))
 
     @staticmethod
     def restart_lol_client():
@@ -243,7 +247,7 @@ class MainWindow(QWidget):
             restart_lol_client()
         except InvalidSettings as e:
             print(e)
-            error_popup(message=str(e))
+            popup_error(message=str(e))
 
     def _get_table_buttons(self, account: Account):
         account_id = account.account_id
