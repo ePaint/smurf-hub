@@ -63,7 +63,7 @@ class KeePass:
                 if not self.master_key:
                     self.master_key, submitted = popup_get_password(error_message=error_message)
                     if not submitted:
-                        exit()
+                        raise KeePassException('KeePass not loaded')
                 self.database = PyKeePass(SETTINGS.keepass_path, password=self.master_key)
                 for group in self.database.root_group.subgroups:
                     if group.name == APP_TITLE:
