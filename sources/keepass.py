@@ -160,7 +160,7 @@ class KeePass:
     def _save_to_env(key, value):
         os.environ[key] = value
         try:
-            subprocess.run(['setx', key, value], check=True, capture_output=True, text=True)
+            subprocess.run(['setx', key, value], check=True, capture_output=True, text=True, shell=True)
             print(f'Successfully set the environment variable: {key}={value}')
         except subprocess.CalledProcessError as e:
             raise KeePassException(f'Error setting the environment variable: {e.stderr}')
