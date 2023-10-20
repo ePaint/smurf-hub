@@ -82,6 +82,10 @@ class KeePass:
         self.group = None
 
     def reload(self, keep_master_key: bool = False):
+        if self.database.filename == SETTINGS.keepass_path:
+            self.load()
+            return
+
         previous_master_key = self.master_key
         previous_database = self.database
         previous_group = self.group
