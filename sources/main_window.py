@@ -99,7 +99,7 @@ class MainWindow(QWidget):
 
     def select_keepass_file(self):
         selected_path = QFileDialog.getOpenFileName(self, 'Select KeePass file', SETTINGS.keepass_path, 'KeePass files (*.kdbx)')[0]
-        self.update_keepass_path(keepass_path=selected_path)
+        self.update_keepass_path(keepass_path=selected_path, load=False)
 
     def add_account(self):
         try:
@@ -186,7 +186,7 @@ class MainWindow(QWidget):
         SETTINGS.set_lol_path(lol_path)
         SETTINGS.save()
 
-    def update_keepass_path(self, keepass_path: str = None):
+    def update_keepass_path(self, keepass_path: str = None, load: bool = True):
         if keepass_path is None:
             keepass_path = self.settings_keepass_path_input.text()
             if not keepass_path:
@@ -204,9 +204,9 @@ class MainWindow(QWidget):
         previous_keepass_path = SETTINGS.keepass_path
         SETTINGS.keepass_path = keepass_path
         try:
-            KEEPASS.reload()
+            if load:
+                KEEPASS.reload()
         except KeePassException as e:
-            print('ERROR', str(e))
             popup_error(message=str(e))
             SETTINGS.keepass_path = previous_keepass_path
             self.settings_keepass_path_input.setText(previous_keepass_path)
