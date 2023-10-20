@@ -1,4 +1,5 @@
 import os
+import subprocess
 from enum import Enum
 from typing import Optional
 from pykeepass.pykeepass import BLANK_DATABASE_PASSWORD
@@ -44,8 +45,7 @@ class KeePass:
         print(f'KeePass secret key: {self.secret_key}')
         if not self.secret_key:
             self.secret_key = Fernet.generate_key().decode('utf-8')
-            os.environ[SECRET_KEY_ENV_VAR] = self.secret_key
-            os.system(f'setx {SECRET_KEY_ENV_VAR} {self.secret_key}')
+            self._save_to_env(SECRET_KEY_ENV_VAR, self.secret_key)
 
         self.master_key: Optional[str] = None
         self.database: Optional[PyKeePass] = None
@@ -141,8 +141,7 @@ class KeePass:
         print(f'Encrypting master key: {self.master_key}')
         encrypted_master_key = Fernet(self.secret_key.encode('utf-8')).encrypt(self.master_key.encode('utf-8'))
         decoded_encrypted_master_key = encrypted_master_key.decode('utf-8')
-        os.environ[MASTER_KEY_ENV_VAR] = decoded_encrypted_master_key
-        os.system(f'setx {MASTER_KEY_ENV_VAR} {decoded_encrypted_master_key}')
+        self._save_to_env(MASTER_KEY_ENV_VAR, decoded_encrypted_master_key)
 
     def load_master_key_from_env(self):
         print(f'Decrypting master key')
@@ -151,11 +150,20 @@ class KeePass:
             return
         self.master_key = Fernet(self.secret_key.encode('utf-8')).decrypt(encrypted_master_key.encode('utf-8')).decode('utf-8')
 
-    @staticmethod
-    def remove_master_key_from_env():
+    def remove_master_key_from_env(self):
         print(f'Removing master key')
         if MASTER_KEY_ENV_VAR in os.environ:
             del os.environ[MASTER_KEY_ENV_VAR]
+            self._save_to_env(MASTER_KEY_ENV_VAR, '')
+
+    @staticmethod
+    def _save_to_env(key, value):
+        os.environ[key] = value
+        try:
+            subprocess.run(['setx', key, value], check=True, capture_output=True, text=True)
+            print(f'Successfully set the environment variable: {key}={value}')
+        except subprocess.CalledProcessError as e:
+            raise KeePassException(f'Error setting the environment variable: {e.stderr}')
 
     @database_required
     def add_account(self, account: Account):

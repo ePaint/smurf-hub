@@ -221,11 +221,23 @@ class MainWindow(QWidget):
     def keepass_cache_toggle(self):
         SETTINGS.keepass_cache = self.settings_keepass_cache_button.isChecked()
         if SETTINGS.keepass_cache:
-            KEEPASS.save_master_key_to_env()
-            popup_info(message='Master key cached!')
+            try:
+                KEEPASS.save_master_key_to_env()
+                popup_info(message='Master key cached!')
+            except KeePassException as e:
+                popup_error(message=str(e))
+                SETTINGS.keepass_cache = False
+                self.settings_keepass_cache_button.setChecked(False)
+                return
         else:
-            KEEPASS.remove_master_key_from_env()
-            popup_info(message='Master key removed from cache!')
+            try:
+                KEEPASS.remove_master_key_from_env()
+                popup_info(message='Master key removed from cache!')
+            except KeePassException as e:
+                popup_error(message=str(e))
+                SETTINGS.keepass_cache = True
+                self.settings_keepass_cache_button.setChecked(True)
+                return
         SETTINGS.save()
         self.keepass_cache_toggle_text()
 
