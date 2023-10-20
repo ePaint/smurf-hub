@@ -92,14 +92,14 @@ class MainWindow(QWidget):
 
     def create_keepass_file(self):
         try:
-            self.update_keepass_path(keepass_path=KEEPASS.create())
+            self.update_keepass_path(keepass_path=KEEPASS.create(), load=False)
         except KeePassException as e:
             popup_error(message=str(e))
             return
 
     def select_keepass_file(self):
         selected_path = QFileDialog.getOpenFileName(self, 'Select KeePass file', SETTINGS.keepass_path, 'KeePass files (*.kdbx)')[0]
-        self.update_keepass_path(keepass_path=selected_path, load=False)
+        self.update_keepass_path(keepass_path=selected_path)
 
     def add_account(self):
         try:
