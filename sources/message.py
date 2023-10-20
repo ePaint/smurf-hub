@@ -31,6 +31,8 @@ class MessagePopup(QDialog):
         else:
             APP_MANAGER.start(AppSource.PASSWORD_POPUP)
 
+        self.raise_()
+
     def _handle_close(self):
         self.close()
 

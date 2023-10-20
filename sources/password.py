@@ -30,6 +30,8 @@ class PasswordPopup(QDialog):
         else:
             APP_MANAGER.start(AppSource.PASSWORD_POPUP)
 
+        self.raise_()
+
     def _handle_close(self):
         self.password = self.password_input.text()
 
