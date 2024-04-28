@@ -1,0 +1,8 @@
+# Description
+This GUI application manages Riot Games accounts allowing the user to quickly switch between accounts
+
+# Usabe
+Run main.py
+
+# Dependencies
+- KeePass to manage credentials
